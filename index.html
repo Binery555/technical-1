@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+Put your HTML text here<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Auto Chart Pattern Signals — Entry, Stop & All Coins Market</title>
+  <link rel="preconnect" href="https://unpkg.com"/>
+  <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0f1722; --accent:#fcd535; --muted:#9ab0c9;
+      --good:#22c55e; --bad:#ef4444; --ink:#e8eef7; --line:#1f2a37;
+      --row:#0b121b; --row2:#0a111a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    .app{display:grid;grid-template-columns:360px 1fr;grid-template-rows:auto 1fr;grid-template-areas:
+      "top top" "side main";height:100%}
+    .top{grid-area:top;display:flex;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:#0e141d;position:sticky;top:0;z-index:10}
+    .top h1{font-size:16px;font-weight:700;letter-spacing:.2px;margin:0}
+    .top .pill{background:rgba(252,213,53,.12);color:var(--accent);padding:4px 8px;border:1px solid rgba(252,213,53,.35);border-radius:999px;font-size:12px}
+    .next-pill{margin-left:auto;display:flex;align-items:center;gap:8px}
+    .next-badge{background:#0b1320;border:1px dashed #2a3a52;color:#cfe2ff;padding:6px 10px;border-radius:10px;font-size:12px;white-space:nowrap}
+    .side{grid-area:side;border-right:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:14px;background:var(--panel);overflow:auto}
+    .group{display:grid;gap:10px}
+    .group h3{font-size:13px;opacity:.9;margin:0 0 -2px}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    label{font-size:13px;color:var(--muted)}
+    select,input,button,textarea{background:#0a111a;border:1px solid #243041;color:var(--ink);padding:8px 10px;border-radius:10px;outline:none}
+    select:focus,input:focus,textarea:focus{border-color:#38506d}
+    button{cursor:pointer}
+    .btn-primary{background:var(--accent);color:#1a1a1a;border-color:#c2a62b;font-weight:700}
+    .btn{padding:8px 12px;border-radius:12px;border:1px solid #2b3b52;background:#0e141d;color:#e6edf7}
+    .main{grid-area:main;display:grid;grid-template-rows:1fr minmax(160px, 34vh);gap:10px;padding:10px}
+    .card{background:#0a111a;border:1px solid #1f2a37;border-radius:14px}
+    #chart{height:100%;}
+    .signals{overflow:auto}
+    table{width:100%;border-collapse:collapse;font-size:12.5px}
+    th,td{padding:8px;border-bottom:1px solid #202b3a;text-align:left}
+    th{position:sticky;top:0;background:#0d1520;z-index:1}
+    .badge{padding:2px 8px;border-radius:999px;border:1px solid #2f3b4d;display:inline-block;font-weight:600}
+    .badge.long{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:var(--good)}
+    .badge.short{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:var(--bad)}
+    .muted{color:var(--muted)}
+    .hint{font-size:12px;color:var(--muted)}
+    .divider{height:1px;background:var(--line);margin:4px 0}
+    .tiny{font-size:11px;color:#93a0b4}
+
+    /* ---- All Coins Market ---- */
+    .marketbox{border:1px solid #1c2838;background:#0a111a;border-radius:12px;overflow:hidden}
+    .market-toolbar{display:flex;gap:8px;padding:8px;border-bottom:1px solid #1c2838;background:#0b121b;align-items:center}
+    .market-toolbar input{flex:1}
+    .mkt-head,.mkt-row{display:grid;grid-template-columns:1fr 90px 86px;gap:8px;align-items:center;padding:8px 10px}
+    .mkt-head{font-size:12px;color:#9fb0c6;background:#0b121b;border-bottom:1px solid #192434}
+    .mkt-list{max-height:320px;overflow:auto}
+    .mkt-row{font-size:13px;border-bottom:1px solid #111a26;background:linear-gradient(0deg,var(--row),var(--row))}
+    .mkt-row:nth-child(2n){background:linear-gradient(0deg,var(--row2),var(--row2))}
+    .mkt-sym{font-weight:700;letter-spacing:.3px}
+    .mkt-price{font-variant-numeric:tabular-nums}
+    .mkt-chg{justify-self:end;font-variant-numeric:tabular-nums;padding:2px 6px;border-radius:8px;border:1px solid #233246}
+    .chg-up{color:var(--good);background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.35)}
+    .chg-dn{color:var(--bad);background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35)}
+    .mkt-row.active{outline:2px solid #375170}
+    .pill-btn{font-size:12px;padding:5px 8px;border-radius:999px;border:1px solid #2a3b52;background:#0d1622;color:#cfe2ff}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <h1>Auto Chart Pattern Signals</h1>
+      <span class="pill">Entry & red Stop-Loss arrows overlay</span>
+      <div class="next-pill">
+        <span id="nextBadge" class="next-badge">Next Entry: waiting…</span>
+        <div class="row">
+          <label class="tiny">Network</label>
+          <select id="netSel" title="Exchange">
+            <option value="binance">Binance (Spot)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="group">
+        <h3>Market</h3>
+        <div class="row">
+          <label>Symbol</label>
+          <input id="symbol" value="BTCUSDT" style="width:120px"/>
+          <label>Interval</label>
+          <select id="interval">
+            <option>1m</option><option>3m</option><option>5m</option><option selected>15m</option><option>30m</option>
+            <option>1h</option><option>2h</option><option>4h</option><option>6h</option><option>12h</option><option>1d</option>
+          </select>
+          <button id="load" class="btn-primary">Load</button>
+        </div>
+        <div class="hint">Uses Binance public REST/WebSocket to stream candles live.</div>
+      </div>
+
+      <div class="group">
+        <h3>Patterns</h3>
+        <div class="row"><label><input type="checkbox" id="pivots" checked/> Swing Pivots</label></div>
+        <div class="row"><label><input type="checkbox" id="dbl" checked/> Double Top / Double Bottom</label></div>
+        <div class="row"><label><input type="checkbox" id="hs" checked/> Head & Shoulders</label></div>
+        <div class="row"><label><input type="checkbox" id="tl" checked/> Trendline Break</label></div>
+        <div class="divider"></div>
+        <div class="row">
+          <label>Pivot L/R</label><input id="pivotSpan" type="number" min="1" max="10" value="3" style="width:70px"/>
+          <label>Tolerance %</label><input id="tol" type="number" min="0.05" step="0.05" value="0.6" style="width:70px"/>
+        </div>
+        <div class="row">
+          <label>Risk Buffer %</label><input id="buf" type="number" step="0.05" value="0.25" style="width:70px"/>
+        </div>
+        <div class="row">
+          <button id="recalc" class="btn">Recalculate</button>
+          <button id="clearMarkers" class="btn">Clear arrows</button>
+        </div>
+      </div>
+
+      <!-- =================== NEW: All Coins Market =================== -->
+      <div class="group">
+        <h3>All Coins Market (Spot)</h3>
+        <div class="marketbox">
+          <div class="market-toolbar">
+            <label class="tiny">Quote</label>
+            <select id="quoteSel" title="Quote filter">
+              <option value="USDT" selected>USDT</option>
+              <option value="FDUSD">FDUSD</option>
+              <option value="ALL">ALL</option>
+            </select>
+            <input id="marketSearch" placeholder="Search symbol…" />
+            <button id="sortBtn" class="pill-btn" title="Toggle sort">Sort: %</button>
+          </div>
+          <div class="mkt-head">
+            <div>Symbol</div><div>Last</div><div style="text-align:right">% 24h*</div>
+          </div>
+          <div id="marketList" class="mkt-list"></div>
+        </div>
+        <div class="tiny">* % uses mini-ticker (close vs session open). Click any row to load its chart/WS.</div>
+      </div>
+      <!-- ============================================================ -->
+
+      <div class="group">
+        <h3>Notes</h3>
+        <div class="tiny">Green arrows = entries. <span style="color:var(--bad);font-weight:700">Red arrows = stop-loss</span>.
+          “NEXT” arrow previews the coming trigger and auto-promotes when crossed.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="card" id="chart"></div>
+      <div class="card signals">
+        <table id="sigTable">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Pattern</th>
+              <th>Side</th>
+              <th>Entry</th>
+              <th>Stop</th>
+              <th>Neckline / Break</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+<script>
+(function(){
+  const d = (sel) => document.querySelector(sel);
+  const netSel = d('#netSel');
+  const symbolEl = d('#symbol');
+  const intervalEl = d('#interval');
+  const loadBtn = d('#load');
+  const recalcBtn = d('#recalc');
+  const clearBtn = d('#clearMarkers');
+  const tolEl = d('#tol');
+  const pivotSpanEl = d('#pivotSpan');
+  const bufEl = d('#buf');
+  const nextBadge = d('#nextBadge');
+
+  // market panel controls
+  const quoteSel = d('#quoteSel');
+  const marketSearch = d('#marketSearch');
+  const marketList = d('#marketList');
+  const sortBtn = d('#sortBtn');
+
+  const opt = { dbl: d('#dbl'), hs: d('#hs'), tl: d('#tl') };
+
+  let chart, series, markers = [], pendingMarkers = [], ws;           // kline WS
+  let candles = []; // {time, open, high, low, close}
+
+  let exSymbols = [];        // [{symbol, base, quote}]
+  let marketRows = new Map();// symbol -> row element
+  let miniWS = null;         // !miniTicker@arr stream
+  let sortMode = 'pct';      // 'pct' | 'az'
+  let selectedSymbol = 'BTCUSDT';
+  let repaintQueued = false;
+
+  // --- Chart setup
+  function initChart(){
+    if(chart){ chart.remove(); }
+    chart = LightweightCharts.createChart(document.getElementById('chart'),{
+      layout:{background:{color:'#0a111a'}, textColor:'#d7e1ee'},
+      rightPriceScale:{borderColor:'#263445'},
+      timeScale:{borderColor:'#263445'},
+      grid:{vertLines:{color:'#0f1824'}, horzLines:{color:'#0f1824'}},
+      crosshair:{mode: LightweightCharts.CrosshairMode.Normal},
+    });
+    series = chart.addCandlestickSeries({
+      upColor:'#16a34a', downColor:'#ef4444',
+      borderUpColor:'#16a34a', borderDownColor:'#ef4444',
+      wickUpColor:'#16a34a', wickDownColor:'#ef4444'
+    });
+  }
+
+  // --- Binance endpoints
+  const BIN_REST = (symbol, interval, limit=1000) => `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  const BIN_WS = (symbol, interval) => `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`;
+  const EXCHANGE_INFO = 'https://api.binance.com/api/v3/exchangeInfo';
+
+  async function loadCandles(symbol, interval){
+    const url = BIN_REST(symbol, interval);
+    const res = await fetch(url);
+    const arr = await res.json();
+    candles = arr.map(k => ({ time: Math.floor(k[0]/1000), open:+k[1], high:+k[2], low:+k[3], close:+k[4] }));
+    series.setData(candles);
+    applyDetections();
+    renderNextPending();
+  }
+
+  function openWS(symbol, interval){
+    if(ws){ try{ ws.close(); }catch(e){} }
+    ws = new WebSocket(BIN_WS(symbol, interval));
+    ws.onmessage = (ev)=>{
+      const msg = JSON.parse(ev.data);
+      if(!msg.k) return;
+      const k = msg.k;
+      const c = { time: Math.floor(k.t/1000), open:+k.o, high:+k.h, low:+k.l, close:+k.c };
+      const last = candles[candles.length-1];
+      if(last && last.time === c.time){ candles[candles.length-1] = c; }
+      else { candles.push(c); }
+      series.update(c);
+      renderNextPending();      // live preview
+      if(k.x) applyDetections();// on candle close
+    };
+  }
+
+  // --- Utilities
+  const pct = (a,b)=> ((a-b)/b)*100;
+  const within = (a,b,tolPct)=> Math.abs(pct(a,b)) <= tolPct;
+
+  // Find swing pivots
+  function findPivots(src, span){
+    const highs=[], lows=[];
+    for(let i=span;i<src.length-span;i++){
+      let isHigh=true, isLow=true;
+      for(let j=i-span;j<=i+span;j++){
+        if(src[j].high > src[i].high) isHigh=false;
+        if(src[j].low < src[i].low) isLow=false;
+        if(!isHigh && !isLow) break;
+      }
+      if(isHigh) highs.push({i, price:src[i].high, time:src[i].time});
+      if(isLow) lows.push({i, price:src[i].low, time:src[i].time});
+    }
+    return {highs,lows};
+  }
+
+  // --------- Pattern detectors (unchanged core) ----------
+  function detectDouble(src, piv, tolPct, bufPct){
+    const out=[];
+    // Tops
+    for(let a=0; a<piv.highs.length; a++){
+      for(let b=a+1; b<Math.min(a+60, piv.highs.length); b++){
+        const A=piv.highs[a], B=piv.highs[b];
+        if(within(A.price,B.price,tolPct)){
+          const midLows = piv.lows.filter(x=> x.i>A.i && x.i<B.i);
+          if(midLows.length===0) continue;
+          const neck = midLows.reduce((m,x)=> x.price<m?x.price:m, Infinity);
+          for(let i=B.i+1;i<src.length;i++){
+            if(src[i].close < neck * (1 - bufPct/100)){
+              out.push({ type:'Double Top', side:'short', entry:src[i].close, stop:Math.max(A.price,B.price)*(1+bufPct/100), time:src[i].time, ctx:{A,B,neck} });
+              break;
+            }
+          }
+        }
+      }
+    }
+    // Bottoms
+    for(let a=0; a<piv.lows.length; a++){
+      for(let b=a+1; b<Math.min(a+60, piv.lows.length); b++){
+        const A=piv.lows[a], B=piv.lows[b];
+        if(within(A.price,B.price,tolPct)){
+          const midHighs = piv.highs.filter(x=> x.i>A.i && x.i<B.i);
+          if(midHighs.length===0) continue;
+          const neck = midHighs.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
+          for(let i=B.i+1;i<src.length;i++){
+            if(src[i].close > neck * (1 + bufPct/100)){
+              out.push({ type:'Double Bottom', side:'long', entry:src[i].close, stop:Math.min(A.price,B.price)*(1-bufPct/100), time:src[i].time, ctx:{A,B,neck} });
+              break;
+            }
+          }
+        }
+      }
+    }
+    return out;
+  }
+
+  function detectHS(src, piv, tolPct, bufPct){
+    const out=[];
+    const H=piv.highs;
+    for(let i=0;i<H.length-2;i++){
+      const L=H[i], Hd=H[i+1], R=H[i+2];
+      if(!(L.i < Hd.i && Hd.i < R.i)) continue;
+      if(!(Hd.price > L.price && Hd.price > R.price)) continue;
+      if(!within(L.price,R.price, tolPct*1.2)) continue;
+      const lowsBetween1 = piv.lows.filter(x=> x.i>L.i && x.i<Hd.i);
+      const lowsBetween2 = piv.lows.filter(x=> x.i>Hd.i && x.i<R.i);
+      if(!lowsBetween1.length || !lowsBetween2.length) continue;
+      const n1 = lowsBetween1.reduce((m,x)=> x.price<m?x.price:m, Infinity);
+      const n2 = lowsBetween2.reduce((m,x)=> x.price<m?x.price:m, Infinity);
+      const neck = Math.min(n1,n2);
+      for(let j=R.i+1;j<src.length;j++){
+        if(src[j].close < neck * (1 - bufPct/100)){
+          out.push({ type:'Head & Shoulders', side:'short', entry:src[j].close, stop:R.price*(1+bufPct/100), time:src[j].time, ctx:{L,Hd,R,neck} });
+          break;
+        }
+      }
+    }
+    // Inverse H&S
+    const LL=piv.lows;
+    for(let i=0;i<LL.length-2;i++){
+      const Ls=LL[i], Hd=LL[i+1], Rs=LL[i+2];
+      if(!(Ls.i < Hd.i && Hd.i < Rs.i)) continue;
+      if(!(Hd.price < Ls.price && Hd.price < Rs.price)) continue;
+      if(!within(Ls.price,Rs.price, tolPct*1.2)) continue;
+      const highsBetween1 = piv.highs.filter(x=> x.i>Ls.i && x.i<Hd.i);
+      const highsBetween2 = piv.highs.filter(x=> x.i>Hd.i && x.i<Rs.i);
+      if(!highsBetween1.length || !highsBetween2.length) continue;
+      const n1 = highsBetween1.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
+      const n2 = highsBetween2.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
+      const neck = Math.max(n1,n2);
+      for(let j=Rs.i+1;j<src.length;j++){
+        if(src[j].close > neck * (1 + bufPct/100)){
+          out.push({ type:'Inverse H&S', side:'long', entry:src[j].close, stop:Rs.price*(1-bufPct/100), time:src[j].time, ctx:{Ls,Hd,Rs,neck} });
+          break;
+        }
+      }
+    }
+    return out;
+  }
+
+  function detectTrendBreak(src, piv, bufPct){
+    const out=[];
+    if(piv.highs.length>=2){
+      const h1=piv.highs[piv.highs.length-2], h2=piv.highs[piv.highs.length-1];
+      const m=(h2.price-h1.price)/(h2.i-h1.i);
+      for(let i=h2.i+1;i<src.length;i++){
+        const tl = h2.price + m*(i-h2.i);
+        if(src[i].close > tl * (1 + bufPct/100)){
+          const low = piv.lows.filter(x=> x.i<i).slice(-1)[0];
+          out.push({ type:'Trendline Break', side:'long', entry:src[i].close, stop:(low? low.price : src[i].low)*(1-bufPct/100), time:src[i].time, ctx:{kind:'downTL'} });
+          break;
+        }
+      }
+    }
+    if(piv.lows.length>=2){
+      const l1=piv.lows[piv.lows.length-2], l2=piv.lows[piv.lows.length-1];
+      const m=(l2.price-l1.price)/(l2.i-l1.i);
+      for(let i=l2.i+1;i<src.length;i++){
+        const tl = l2.price + m*(i-l2.i);
+        if(src[i].close < tl * (1 - bufPct/100)){
+          const high = piv.highs.filter(x=> x.i<i).slice(-1)[0];
+          out.push({ type:'Trendline Break', side:'short', entry:src[i].close, stop:(high? high.price : src[i].high)*(1+bufPct/100), time:src[i].time, ctx:{kind:'upTL'} });
+          break;
+        }
+      }
+    }
+    return out;
+  }
+
+  function addArrowMarkers(signals){
+    const mks=[];
+    for(const s of signals){
+      const entryShape = s.side==='long' ? 'arrowUp' : 'arrowDown';
+      const stopShape  = s.side==='long' ? 'arrowDown' : 'arrowUp';
+      mks.push({ time: s.time, position: 'inBar', color: '#22c55e', shape: entryShape, text: `${s.type} ${s.side==='long'?'LONG':'SHORT'} entry`, size: 2, price: s.entry });
+      mks.push({ time: s.time, position: 'inBar', color: '#ef4444', shape: stopShape,  text: `Stop @ ${s.stop.toFixed(6)}`, size: 2, price: s.stop  });
+    }
+    markers = markers.concat(mks);
+    series.setMarkers(markers.concat(pendingMarkers));
+  }
+
+  function pushSignalsToTable(signals){
+    const tb = document.querySelector('#sigTable tbody');
+    for(const s of signals){
+      const tr = document.createElement('tr');
+      const t = new Date(s.time*1000).toLocaleString();
+      tr.innerHTML = `
+        <td class="muted">${t}</td>
+        <td>${s.type}</td>
+        <td>${s.side==='long'?'<span class="badge long">LONG</span>':'<span class="badge short">SHORT</span>'}</td>
+        <td>${s.entry.toFixed(6)}</td>
+        <td style="color:var(--bad);font-weight:700">${s.stop.toFixed(6)}</td>
+        <td class="muted">${s.ctx?.neck? (s.ctx.neck.toFixed? s.ctx.neck.toFixed(6): s.ctx.neck) : (s.ctx?.kind||'')}</td>
+        <td class="muted">auto-detected</td>
+      `;
+      tb.prepend(tr);
+    }
+  }
+
+  function applyDetections(){
+    const span = Math.max(2, (+d('#pivotSpan').value|0) || 3);
+    const tolPct = Math.max(0.05, +tolEl.value || 0.6);
+    const bufPct = Math.max(0.01, +bufEl.value || 0.25);
+
+    const piv = findPivots(candles, span);
+
+    let signals=[];
+    if(opt.dbl.checked) signals = signals.concat(detectDouble(candles, piv, tolPct, bufPct));
+    if(opt.hs.checked)  signals = signals.concat(detectHS(candles, piv, tolPct, bufPct));
+    if(opt.tl.checked)  signals = signals.concat(detectTrendBreak(candles, piv, bufPct));
+
+    if(signals.length){
+      const seen = new Set(markers.filter(m=>m.text?.includes('entry')).map(m=> m.time+'|'+m.text));
+      const fresh = signals.filter(s=> !seen.has(s.time+'|'+`${s.type} ${s.side==='long'?'LONG':'SHORT'} entry`));
+      if(fresh.length){
+        addArrowMarkers(fresh);
+        pushSignalsToTable(fresh);
+      }
+    }
+  }
+
+  function clearAllMarkers(){
+    markers=[]; pendingMarkers=[]; series.setMarkers([]);
+    document.querySelector('#sigTable tbody').innerHTML='';
+    nextBadge.textContent = 'Next Entry: waiting…';
+  }
+
+  // ---------- PENDING (NEXT ENTRY) preview ----------
+  function computePending(src, piv, tolPct, bufPct){
+    const out=[]; const n = src.length; const last = src[n-1];
+    if(!last) return out;
+
+    // Double Top/Bottom (recent)
+    if(opt.dbl.checked){
+      for(let a=Math.max(0,piv.highs.length-6); a<piv.highs.length; a++){
+        for(let b=a+1; b<piv.highs.length; b++){
+          const A=piv.highs[a], B=piv.highs[b];
+          if(!A||!B||B.i<=A.i) continue;
+          if(within(A.price,B.price,tolPct)){
+            const midLows = piv.lows.filter(x=> x.i>A.i && x.i<B.i);
+            if(!midLows.length) continue;
+            const neck = midLows.reduce((m,x)=> x.price<m?x.price:m, Infinity);
+            const trigger = neck * (1 - bufPct/100);
+            const stop = Math.max(A.price,B.price) * (1 + bufPct/100);
+            if(last.close >= trigger){
+              out.push({score:B.time, type:'Double Top', side:'short', trigger, stop, setupTime:B.time, ctx:{A,B,neck}});
+            }
+          }
+        }
+      }
+      for(let a=Math.max(0,piv.lows.length-6); a<piv.lows.length; a++){
+        for(let b=a+1; b<piv.lows.length; b++){
+          const A=piv.lows[a], B=piv.lows[b];
+          if(!A||!B||B.i<=A.i) continue;
+          if(within(A.price,B.price,tolPct)){
+            const midHighs = piv.highs.filter(x=> x.i>A.i && x.i<B.i);
+            if(!midHighs.length) continue;
+            const neck = midHighs.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
+            const trigger = neck * (1 + bufPct/100);
+            const stop = Math.min(A.price,B.price) * (1 - bufPct/100);
+            if(last.close <= trigger){
+              out.push({score:B.time, type:'Double Bottom', side:'long', trigger, stop, setupTime:B.time, ctx:{A,B,neck}});
+            }
+          }
+        }
+      }
+    }
+
+    // H&S
+    if(opt.hs.checked){
+      const H=piv.highs;
+      for(let i=Math.max(0,H.length-8); i<H.length-2; i++){
+        const L=H[i], Hd=H[i+1], R=H[i+2];
+        if(!(L&&Hd&&R) || !(L.i<Hd.i && Hd.i<R.i)) continue;
+        if(!(Hd.price > L.price && Hd.price > R.price)) continue;
+        if(!within(L.price,R.price, tolPct*1.2)) continue;
+        const lowsBetween1 = piv.lows.filter(x=> x.i>L.i && x.i<Hd.i);
+        const lowsBetween2 = piv.lows.filter(x=> x.i>Hd.i && x.i<R.i);
+        if(!lowsBetween1.length || !lowsBetween2.length) continue;
+        const neck = Math.min(
+          lowsBetween1.reduce((m,x)=> x.price<m?x.price:m, Infinity),
+          lowsBetween2.reduce((m,x)=> x.price<m?x.price:m, Infinity)
+        );
+        const trigger = neck * (1 - bufPct/100);
+        const stop = R.price*(1+bufPct/100);
+        if(last.close >= trigger){
+          out.push({score:R.time, type:'Head & Shoulders', side:'short', trigger, stop, setupTime:R.time, ctx:{L,Hd,R,neck}});
+        }
+      }
+      // Inverse
+      const LL=piv.lows;
+      for(let i=Math.max(0,LL.length-8); i<LL.length-2; i++){
+        const Ls=LL[i], Hd=LL[i+1], Rs=LL[i+2];
+        if(!(Ls&&Hd&&Rs) || !(Ls.i<Hd.i && Hd.i<Rs.i)) continue;
+        if(!(Hd.price < Ls.price && Hd.price < Rs.price)) continue;
+        if(!within(Ls.price,Rs.price, tolPct*1.2)) continue;
+        const highsBetween1 = piv.highs.filter(x=> x.i>Ls.i && x.i<Hd.i);
+        const highsBetween2 = piv.highs.filter(x=> x.i>Hd.i && x.i<Rs.i);
+        if(!highsBetween1.length || !highsBetween2.length) continue;
+        const neck = Math.max(
+          highsBetween1.reduce((m,x)=> x.price>m?x.price:m, -Infinity),
+          highsBetween2.reduce((m,x)=> x.price>m?x.price:m, -Infinity)
+        );
+        const trigger = neck * (1 + bufPct/100);
+        const stop = Rs.price*(1-bufPct/100);
+        if(last.close <= trigger){
+          out.push({score:Rs.time, type:'Inverse H&S', side:'long', trigger, stop, setupTime:Rs.time, ctx:{Ls,Hd,Rs,neck}});
+        }
+      }
+    }
+
+    // Trendline
+    if(opt.tl.checked){
+      if(piv.highs.length>=2){
+        const h1=piv.highs[piv.highs.length-2], h2=piv.highs[piv.highs.length-1];
+        const m=(h2.price-h1.price)/(h2.i-h1.i);
+        const i = src.length-1;
+        const tl = h2.price + m*(i-h2.i);
+        const trigger = tl * (1 + bufPct/100);
+        const low = piv.lows.filter(x=> x.i<i).slice(-1)[0];
+        const stop = (low?low.price:src[i].low) * (1 - bufPct/100);
+        if(src[i].close <= trigger){
+          out.push({score:h2.time, type:'Trendline Break', side:'long', trigger, stop, setupTime:h2.time, ctx:{kind:'downTL*'}});
+        }
+      }
+      if(piv.lows.length>=2){
+        const l1=piv.lows[piv.lows.length-2], l2=piv.lows[piv.lows.length-1];
+        const m=(l2.price-l1.price)/(l2.i-l1.i);
+        const i = src.length-1;
+        const tl = l2.price + m*(i-l2.i);
+        const trigger = tl * (1 - bufPct/100);
+        const high = piv.highs.filter(x=> x.i<i).slice(-1)[0];
+        const stop = (high?high.price:src[i].high) * (1 + bufPct/100);
+        if(src[i].close >= trigger){
+          out.push({score:l2.time, type:'Trendline Break', side:'short', trigger, stop, setupTime:l2.time, ctx:{kind:'upTL*'}});
+        }
+      }
+    }
+
+    out.sort((a,b)=> b.score - a.score);
+    return out[0] ? [out[0]] : [];
+  }
+
+  function renderNextPending(){
+    const span = Math.max(2, (+d('#pivotSpan').value|0) || 3);
+    const tolPct = Math.max(0.05, +tolEl.value || 0.6);
+    const bufPct = Math.max(0.01, +bufEl.value || 0.25);
+    if(candles.length<span*3){ return; }
+
+    const piv = findPivots(candles, span);
+    const nextCandidates = computePending(candles, piv, tolPct, bufPct);
+
+    pendingMarkers = [];
+    if(nextCandidates.length){
+      const s = nextCandidates[0];
+      const entryShape = s.side==='long' ? 'arrowUp' : 'arrowDown';
+      const stopShape  = s.side==='long' ? 'arrowDown' : 'arrowUp';
+      const t = candles[candles.length-1].time;
+
+      pendingMarkers.push({ time:t, position:'inBar', color:'#22c55e', shape:entryShape, size:1, text:`NEXT ${s.side==='long'?'LONG':'SHORT'} @ ${s.trigger.toFixed(6)} • ${s.type}`, price:s.trigger });
+      pendingMarkers.push({ time:t, position:'inBar', color:'#ef4444', shape:stopShape,  size:1, text:`SL ${s.stop.toFixed(6)} (pending)`, price:s.stop });
+
+      nextBadge.textContent = `Next Entry: ${s.side.toUpperCase()} @ ${s.trigger.toFixed(6)} (${s.type}) • SL ${s.stop.toFixed(6)}`;
+    } else {
+      nextBadge.textContent = 'Next Entry: waiting…';
+    }
+    series.setMarkers(markers.concat(pendingMarkers));
+
+    // Promote if crossed
+    if(nextCandidates.length){
+      const s = nextCandidates[0];
+      const last = candles[candles.length-1];
+      const crossed = (s.side==='long') ? (last.close > s.trigger) : (last.close < s.trigger);
+      if(crossed){
+        const triggered = [{ type: s.type, side: s.side, entry: last.close, stop: s.stop, time: last.time, ctx: s.ctx }];
+        addArrowMarkers(triggered);
+        pushSignalsToTable(triggered);
+        pendingMarkers = [];
+        series.setMarkers(markers);
+        nextBadge.textContent = 'Next Entry: waiting…';
+      }
+    }
+  }
+
+  // ======================= All Coins Market =======================
+  async function loadExchangeInfo(){
+    const res = await fetch(EXCHANGE_INFO);
+    const info = await res.json();
+    exSymbols = info.symbols
+      .filter(s => s.status === 'TRADING' && s.isSpotTradingAllowed)
+      .map(s => ({ symbol:s.symbol, base:s.baseAsset, quote:s.quoteAsset }));
+    buildMarketList();      // initial DOM
+    openMiniTicker();       // live updates
+  }
+
+  function buildMarketList(){
+    marketList.innerHTML = '';
+    marketRows.clear();
+
+    const q = quoteSel.value;
+    const term = marketSearch.value.trim().toUpperCase();
+
+    const filtered = exSymbols.filter(x => {
+      const byQuote = (q==='ALL') ? true : (x.quote === q);
+      const byTerm  = term ? (x.symbol.includes(term) || x.base.includes(term)) : true;
+      return byQuote && byTerm;
+    });
+
+    // Create rows (empty values, to be filled by WS)
+    for(const x of filtered){
+      const row = document.createElement('div');
+      row.className = 'mkt-row';
+      row.dataset.symbol = x.symbol;
+      row.dataset.price = '0';
+      row.dataset.pct = '0';
+      row.innerHTML = `
+        <div class="mkt-sym">${x.symbol}</div>
+        <div class="mkt-price">—</div>
+        <div class="mkt-chg chg-up">0.00%</div>
+      `;
+      row.onclick = ()=> selectMarketSymbol(x.symbol);
+      marketList.appendChild(row);
+      marketRows.set(x.symbol, row);
+    }
+    sortMarketList();
+    highlightActiveRow();
+  }
+
+  function sortMarketList(){
+    const rows = Array.from(marketList.children);
+    if(sortMode === 'pct'){
+      rows.sort((a,b)=> (+b.dataset.pct) - (+a.dataset.pct));
+    } else {
+      rows.sort((a,b)=> a.dataset.symbol.localeCompare(b.dataset.symbol));
+    }
+    rows.forEach(r=> marketList.appendChild(r));
+  }
+
+  function queueRepaint(){
+    if(repaintQueued) return;
+    repaintQueued = true;
+    requestAnimationFrame(()=>{ repaintQueued=false; sortMarketList(); highlightActiveRow(); });
+  }
+
+  function highlightActiveRow(){
+    const rows = marketList.querySelectorAll('.mkt-row');
+    rows.forEach(r => r.classList.toggle('active', r.dataset.symbol === selectedSymbol));
+  }
+
+  function openMiniTicker(){
+    if(miniWS){ try{ miniWS.close(); }catch(e){} }
+    miniWS = new WebSocket('wss://stream.binance.com:9443/ws/!miniTicker@arr');
+    miniWS.onmessage = (ev)=>{
+      let msg = JSON.parse(ev.data);
+      const arr = Array.isArray(msg) ? msg : (Array.isArray(msg.data) ? msg.data : []);
+      if(!arr.length) return;
+
+      // Update rows we have in DOM
+      for(const t of arr){
+        const sym = t.s; // symbol
+        const row = marketRows.get(sym);
+        if(!row) continue; // not in current filter
+        const last = +t.c, open = +t.o;
+        if(!isFinite(last) || !isFinite(open) || open===0) continue;
+        const change = ((last - open) / open) * 100;
+
+        row.dataset.price = last;
+        row.dataset.pct = change.toFixed(2);
+
+        const priceEl = row.children[1];
+        const pctEl = row.children[2];
+        priceEl.textContent = last.toString();
+        pctEl.textContent = (change>=0? '+' : '') + change.toFixed(2) + '%';
+        pctEl.className = 'mkt-chg ' + (change>=0 ? 'chg-up' : 'chg-dn');
+      }
+      // Don’t sort on every tick; batch with rAF
+      queueRepaint();
+    };
+  }
+
+  function selectMarketSymbol(sym){
+    selectedSymbol = sym;
+    symbolEl.value = sym;
+    loadBtn.click();
+    highlightActiveRow();
+  }
+
+  // UI handlers for market panel
+  quoteSel.onchange = buildMarketList;
+  marketSearch.oninput = ()=>{
+    // tiny debounce
+    clearTimeout(marketSearch._t);
+    marketSearch._t = setTimeout(buildMarketList, 150);
+  };
+  sortBtn.onclick = ()=>{
+    sortMode = (sortMode==='pct') ? 'az' : 'pct';
+    sortBtn.textContent = 'Sort: ' + (sortMode==='pct' ? '%' : 'A–Z');
+    sortMarketList();
+  };
+  // ===============================================================
+
+  // --- Wire chart UI
+  loadBtn.onclick = async()=>{
+    const sym = symbolEl.value.trim().toUpperCase();
+    const tf = intervalEl.value.trim();
+    selectedSymbol = sym;
+    initChart();
+    await loadCandles(sym, tf);
+    openWS(sym, tf);
+    highlightActiveRow();
+  };
+  d('#recalc').onclick = ()=>{ applyDetections(); renderNextPending(); };
+  d('#clearMarkers').onclick = clearAllMarkers;
+
+  // Bootstrap default
+  (async function bootstrap(){
+    initChart();
+    selectedSymbol = symbolEl.value.trim().toUpperCase();
+    await loadExchangeInfo();    // fills the market panel
+    loadBtn.click();             // loads default chart + kline WS
+  })();
+})();
+</script>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
