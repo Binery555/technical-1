@@ -1,754 +1,1979 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Untitled</title>
-  
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-Put your HTML text here<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Auto Chart Pattern Signals — Entry, Stop & All Coins Market</title>
-  <link rel="preconnect" href="https://unpkg.com"/>
-  <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+  <meta charset="UTF-8" />
+  <!-- ✅ iPhone 16 Pro Max safe-area + proper scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Futures Assets Mockup — with 6M Trend Profit Cards (Top bars fixed, Frame Removed, +20 trades, random small-loss duo) — Margin Persistent</title>
+
+  <!-- ✅ iPhone Safari fullscreen / hide URL bar -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Futures Assets">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Binance PLEX for better '1' glyph -->
+  <link href="https://db.onlinewebfonts.com/c/d05c19ccecf7003d248c60ffd6b5e8f7?family=Binance+PLEX" rel="stylesheet"/>
+
+  <!-- html2canvas for saving only the PNL card -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
   <style>
     :root{
-      --bg:#0b0f14; --panel:#0f1722; --accent:#fcd535; --muted:#9ab0c9;
-      --good:#22c55e; --bad:#ef4444; --ink:#e8eef7; --line:#1f2a37;
-      --row:#0b121b; --row2:#0a111a;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
-    .app{display:grid;grid-template-columns:360px 1fr;grid-template-rows:auto 1fr;grid-template-areas:
-      "top top" "side main";height:100%}
-    .top{grid-area:top;display:flex;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:#0e141d;position:sticky;top:0;z-index:10}
-    .top h1{font-size:16px;font-weight:700;letter-spacing:.2px;margin:0}
-    .top .pill{background:rgba(252,213,53,.12);color:var(--accent);padding:4px 8px;border:1px solid rgba(252,213,53,.35);border-radius:999px;font-size:12px}
-    .next-pill{margin-left:auto;display:flex;align-items:center;gap:8px}
-    .next-badge{background:#0b1320;border:1px dashed #2a3a52;color:#cfe2ff;padding:6px 10px;border-radius:10px;font-size:12px;white-space:nowrap}
-    .side{grid-area:side;border-right:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:14px;background:var(--panel);overflow:auto}
-    .group{display:grid;gap:10px}
-    .group h3{font-size:13px;opacity:.9;margin:0 0 -2px}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    label{font-size:13px;color:var(--muted)}
-    select,input,button,textarea{background:#0a111a;border:1px solid #243041;color:var(--ink);padding:8px 10px;border-radius:10px;outline:none}
-    select:focus,input:focus,textarea:focus{border-color:#38506d}
-    button{cursor:pointer}
-    .btn-primary{background:var(--accent);color:#1a1a1a;border-color:#c2a62b;font-weight:700}
-    .btn{padding:8px 12px;border-radius:12px;border:1px solid #2b3b52;background:#0e141d;color:#e6edf7}
-    .main{grid-area:main;display:grid;grid-template-rows:1fr minmax(160px, 34vh);gap:10px;padding:10px}
-    .card{background:#0a111a;border:1px solid #1f2a37;border-radius:14px}
-    #chart{height:100%;}
-    .signals{overflow:auto}
-    table{width:100%;border-collapse:collapse;font-size:12.5px}
-    th,td{padding:8px;border-bottom:1px solid #202b3a;text-align:left}
-    th{position:sticky;top:0;background:#0d1520;z-index:1}
-    .badge{padding:2px 8px;border-radius:999px;border:1px solid #2f3b4d;display:inline-block;font-weight:600}
-    .badge.long{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:var(--good)}
-    .badge.short{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:var(--bad)}
-    .muted{color:var(--muted)}
-    .hint{font-size:12px;color:var(--muted)}
-    .divider{height:1px;background:var(--line);margin:4px 0}
-    .tiny{font-size:11px;color:#93a0b4}
+      /* ✅ Target Apple 16 Pro Max logical width */
+      --app-w: 430px;
 
-    /* ---- All Coins Market ---- */
-    .marketbox{border:1px solid #1c2838;background:#0a111a;border-radius:12px;overflow:hidden}
-    .market-toolbar{display:flex;gap:8px;padding:8px;border-bottom:1px solid #1c2838;background:#0b121b;align-items:center}
-    .market-toolbar input{flex:1}
-    .mkt-head,.mkt-row{display:grid;grid-template-columns:1fr 90px 86px;gap:8px;align-items:center;padding:8px 10px}
-    .mkt-head{font-size:12px;color:#9fb0c6;background:#0b121b;border-bottom:1px solid #192434}
-    .mkt-list{max-height:320px;overflow:auto}
-    .mkt-row{font-size:13px;border-bottom:1px solid #111a26;background:linear-gradient(0deg,var(--row),var(--row))}
-    .mkt-row:nth-child(2n){background:linear-gradient(0deg,var(--row2),var(--row2))}
-    .mkt-sym{font-weight:700;letter-spacing:.3px}
-    .mkt-price{font-variant-numeric:tabular-nums}
-    .mkt-chg{justify-self:end;font-variant-numeric:tabular-nums;padding:2px 6px;border-radius:8px;border:1px solid #233246}
-    .chg-up{color:var(--good);background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.35)}
-    .chg-dn{color:var(--bad);background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35)}
-    .mkt-row.active{outline:2px solid #375170}
-    .pill-btn{font-size:12px;padding:5px 8px;border-radius:999px;border:1px solid #2a3b52;background:#0d1622;color:#cfe2ff}
+      --bg-base:#1E2128;
+      --panel-bg:#1e2127;
+      --secondary-bg:#32383e;
+      --text-secondary:#7c828a;
+      --text-green:#3acf87;
+      --text-red:#e04b4a;
+      --btn-bg:#2f3339;
+      --highlight:#f0b90b;
+
+      --seg-w: 170px;
+      --seg-h: 24px;
+      --seg-pad: 2px;
+      --seg-gap: 2px;
+      --seg-r: 10px;
+      --seg-thumb-r: 6px;
+      --seg-font: 12px;
+
+      --frame-gutter-x: 8px;
+      --card-inset: 2px;
+
+      --slot-top: 16px;
+      --slot-bottom: 14px;
+
+      --bottom-nav-h: 64px;
+
+      --scene-offset-x: -0.5cm;
+      --scene-offset-y: 1.1cm;
+
+      /* ✅ Footer badge alignment helpers */
+      --badge-icon: 16px;
+      --badge-gap: 8px;
+
+      /* ✅ Will be set by JS using visualViewport (vh fix on iOS) */
+      --vh: 1vh;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      background:var(--bg-base);
+      display:flex;justify-content:center;align-items:flex-start;
+      /* ✅ Full viewport height that respects iOS browser UI */
+      min-height: calc(var(--vh) * 100);
+      color:#E1E3E8;
+    }
+    .app{
+      width:var(--app-w);
+      max-width:100%;
+      background:var(--bg-base);color:#E1E3E8;
+      border:none;border-radius:0;overflow:visible;position:relative;
+      /* ✅ Add bottom safe-area so content never hides behind home bar */
+      padding:12px var(--frame-gutter-x) calc(80px + env(safe-area-inset-bottom, 0px));
+      font-family:Inter, "Segoe UI", Roboto, sans-serif
+    }
+    .amount,.value,.rate{font-family:Inter, "Segoe UI", Roboto, sans-serif!important}
+    button{cursor:pointer;border:none;background:transparent;font:inherit;color:inherit}
+
+    .top-stack{
+      position:sticky; top:0; z-index:30;
+      background:var(--bg-base);
+      border-bottom:none !important;
+      padding-bottom:8px; margin-bottom:8px;
+      /* ✅ Top safe-area for Dynamic Island/notch if needed */
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .top-toggle{
+      position:relative;width:var(--seg-w);
+      margin:2px auto 6px;padding:var(--seg-pad);
+      background:#20242c;border:1px solid #343a40;border-radius:var(--seg-r);
+      display:grid;grid-template-columns:1fr 1fr;gap:var(--seg-gap);
+    }
+    .top-toggle .seg-thumb{
+      position:absolute;top:var(--seg-pad);bottom:var(--seg-pad);left:var(--seg-pad);
+      width:calc(50% - var(--seg-gap));
+      background:#2b303a;border:1px solid #3f4652;border-radius:var(--seg-thumb-r);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 2px 8px rgba(0,0,0,.35);
+      transition:transform .25s ease;transform:translateX(0%);
+    }
+    .top-toggle .toggle-btn{
+      position:relative;z-index:1;height:var(--seg-h);line-height:var(--seg-h);
+      padding:0 8px;font-size:var(--seg-font);font-weight:700;color:#9ba3af;border-radius:var(--seg-thumb-r);
+      letter-spacing:.2px;
+    }
+    .top-toggle .toggle-btn.active{ color:#fff; }
+
+    .main-nav{display:flex;justify-content:flex-start;gap:10px;margin:2px 0 6px 0}
+    .main-nav button{padding:8px 6px;font-size:13px;color:#A1A6B0}
+    .main-nav button.active{color:#FFF;border-bottom:2px solid #FFF}
+    .main-nav button:first-child{ margin-left:-6px; }
+
+    .sub-toggle{display:flex;gap:6px;margin:8px 0 0 0;border-bottom:none !important;box-shadow:none !important;}
+    .sub-toggle .toggle-btn{padding:4px 8px;font-size:11px;color:#A1A6B0;border-radius:6px;background:transparent;}
+    .sub-toggle .toggle-btn.active{background:#323742;color:#FFF}
+
+    .balance-panel{margin:12px 0}
+    .balance-header{display:flex;justify-content:space-between;align-items:center;color:#A1A6B0;font-size:12px}
+    .balance-header span{display:flex;align-items:center;gap:10px}
+    .balance-amount{display:flex;align-items:flex-end;margin:8px 0}
+    .amount{font-size:28px;font-weight:600}
+    .currency{margin-left:8px;color:#A1A6B0;font-size:12px}
+    .realized-pnl{color:#A1A6B0;font-size:12px}
+    .realized-pnl .gain{color:var(--text-green);font-weight:700}
+
+    .small-balances{display:flex;margin-top:12px;justify-content:space-between}
+    .small-item{display:flex;flex-direction:column}
+    .small-item .label{color:#A1A6B0;font-size:12px}
+    .small-item .value{font-size:14px;font-weight:600;margin-top:4px}
+
+    .actions{display:flex;margin:14px 0}
+    .btn{flex:1;padding:8px 0;font-size:13px;margin:0 4px;border-radius:6px;background:#323742;color:#A1A6B0}
+    .btn.primary,.btn.active{background:#F3BA2F;color:#1E2128}
+
+    .sub-nav-2{
+      position:sticky; top:12px; z-index:20;
+      display:flex;align-items:flex-end;gap:16px;margin:0 0 8px 0;
+      background:linear-gradient(var(--bg-base), var(--bg-base));
+      padding-top:6px;
+    }
+    .sub-nav-2 button{position:relative;padding:0 6px 8px;font-size:14px;font-weight:700;letter-spacing:.1px;color:var(--text-secondary);line-height:1}
+    .sub-nav-2 button.active{color:#fff}
+
+    .feed{
+      overflow-y:auto; overscroll-behavior-y: contain;
+      padding:12px 0 20px; background:var(--bg-base);
+      scrollbar-width:none; border-top:none !important;
+    }
+    .feed::-webkit-scrollbar{display:none}
+
+    .empty-state{margin:0 0;background:var(--panel-bg);border-radius:10px;padding:20px;text-align:center;border:1px solid #2b2f36}
+    .empty-state i{font-size:28px;opacity:.9;margin-bottom:10px;display:inline-block}
+    .empty-state h4{font-size:14px;margin-bottom:6px}
+    .empty-state p{font-size:12px;color:#A1A6B0;margin-bottom:12px}
+    .empty-state .cta{background:#F3BA2F;color:#1E2128;font-size:12px;padding:8px 12px;border-radius:6px;display:inline-flex;align-items:center;gap:6px}
+
+    .trade-panel {
+      background: var(--panel-bg);
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      box-shadow: none;
+      margin-left:calc(-1 * (var(--frame-gutter-x) - var(--card-inset)));
+      margin-right:calc(-1 * (var(--frame-gutter-x) - var(--card-inset)));
+    }
+    .trade-panel + .trade-panel{margin-top:8px}
+    .trade-panel .header { display: flex; align-items: center; margin-bottom: 8px; }
+    .icon-buy, .icon-sell {
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      display:flex;align-items:center;justify-content:center;
+      font-size: 12px; font-weight: 700; margin-right: 8px; border-radius: 2px;
+    }
+    .icon-buy { background: var(--text-green); }
+    .icon-sell { background: var(--text-red); }
+    .symbol { font-size: 14px; font-weight: 600; margin-right: 6px; color:#fff; }
+    .tag {
+      background: var(--secondary-bg);
+      color: var(--text-secondary);
+      font-size: 10px;
+      padding: 1px 4px;
+      margin-right: 4px;
+      text-transform: uppercase;
+      border-radius: 3px;
+    }
+    .exclamations { display: flex; margin-left: 6px; }
+    .exclamations span {
+      position: relative;
+      width: 2px;
+      height: 10px;
+      background: var(--secondary-bg);
+      margin: 0 1px;
+      border-radius: 1px;
+      transition: background 0.3s ease;
+    }
+    .exclamations span::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 2px;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .exclamations span.green, .exclamations span.green::after { background: var(--text-green); }
+    .share { margin-left: auto; color: var(--text-secondary); font-size: 16px; cursor: pointer; }
+
+    .content-columns {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+    .column { display: flex; flex-direction: column; }
+    .column.right { text-align: right; }
+    .stat { margin-bottom: 8px; }
+    .label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      border-bottom: 1px dotted var(--text-secondary);
+      padding-bottom: 2px;
+      display: inline-block;
+    }
+    .label.no-line { border-bottom: none; }
+    .value { font-size: 14px; font-weight: 400; color: #fff; transition: all 0.2s ease; }
+    .value.green, .value.percent.green { color: var(--text-green); font-size: 18px; font-weight: 700; }
+    .value.red, .value.percent.red { color: var(--text-red); font-size: 18px; font-weight: 700; }
+    .margin-ratio-value { font-size: 12px !important; }
+
+    .tp-actions{
+      display:flex;justify-content:space-between;gap:8px;margin-top:2px
+    }
+    .tp-btn{
+      flex:1;background:var(--btn-bg);color:#fff;border:none;border-radius:6px;
+      padding:6px 0;font-size:12px;cursor:pointer;transition:background .3s
+    }
+    .tp-btn:hover{background:var(--secondary-bg)}
+
+    .bottom-nav{
+      position:fixed;
+      bottom:0;
+      left:50%;
+      transform:translateX(-50%);
+      width:var(--app-w);
+      background:#1e2128;
+      display:flex;
+      padding:8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+      border-top:none;
+      z-index:40;
+    }
+    .bottom-nav button{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      font-size:10px;
+      color:#A1A6B0;
+      background:transparent;
+    }
+    .bottom-nav button.active{color:#FFF}
+
+    .photo-slot{
+      width:var(--slot-top); height:var(--slot-top);
+      display:inline-block; position:relative; overflow:hidden; border:none; outline:none;
+      background:transparent; border-radius:4px;
+    }
+    .photo-slot--bottom{ width:var(--slot-bottom); height:var(--slot-bottom); border-radius:3px; }
+    .photo-slot input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .photo-slot img{
+      width:88%; height:88%; margin:6%;
+      object-fit:cover; display:block;
+      border:none; outline:none; background:transparent;
+      image-rendering:auto;
+    }
+    .photo-slot--bottom img{
+      width:90%; height:90%; margin:5%; object-fit:cover; display:block;
+    }
+    .photo-empty::after{
+      content:''; position:absolute; inset:0; background:transparent;
+    }
+
+    .pnl-modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.6);
+      display:none; align-items:flex-end; justify-content:center; z-index:1000;
+      padding:0 12px calc(var(--bottom-nav-h) + 10px + env(safe-area-inset-bottom, 0px));
+    }
+    .pnl-modal-backdrop.open{ display:flex; }
+    .pnl-modal{ position:relative; max-width:520px; width:100%; outline:0; border:0; background:transparent; }
+    .pnl-close{ display:none !important; }
+
+    .pnl-scene{
+      background:#2f343d;
+      border:1px solid #3a3f49;
+      border-radius:18px;
+      padding:12px 12px 16px;
+      margin:0 auto;
+      width:calc(350px + 1.2cm);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      box-shadow:0 8px 20px rgba(0,0,0,.35) inset;
+      transform: translate(var(--scene-offset-x), var(--scene-offset-y));
+      overflow:hidden;
+    }
+
+    /* Inner swipeable carousel */
+    .pnl-carousel{ width:calc(350px - 1cm); overflow:hidden; touch-action:pan-y; cursor:grab; }
+    .pnl-carousel.grabbing{ cursor:grabbing; }
+    .pnl-track{ display:flex; width:300%; will-change:transform; transition:transform .25s ease; }
+    .pnl-slide{ width:calc(350px - 1cm); flex:0 0 calc(350px - 1cm); padding:0; }
+
+    .pnl-card {
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif !important;
+      font-feature-settings:"tnum"1,"lnum"1;
+      letter-spacing:.15px;
+      color:#fff;
+      border-radius:16px;
+      width:100%;
+      overflow:hidden;
+      box-shadow:0 0 10px rgba(0,0,0,.6);
+      border:2px solid #2e2e2e;
+      position:relative;
+      margin:0 auto;
+      background:#000 center/cover no-repeat; /* default, overridden per slide */
+    }
+    /* 🔰 Backgrounds per slide */
+    .pnl-card.bg1{ background-image:url('https://iili.io/Kr9UiVR.gif'); }
+    .pnl-card.bg2{ background-image:url('https://iili.io/Kgp9GJj.gif'); }
+    .pnl-card.bg3{ background-image:url('https://iili.io/KiPqNbp.gif'); }
+
+    .pnl-card .card-header {
+      padding:16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:1cm;
+    }
+
+    .pnl-card .avatar { width:32px; height:32px; border-radius:50%; overflow:hidden; flex:0 0 32px; }
+    .pnl-card .avatar img { width:100%; height:100%; object-fit:cover; }
+
+    .pnl-card .username { display:flex; flex-direction:column; }
+    .pnl-card .username span:first-child { font-weight:600; font-size:13px; }
+    .pnl-card .username span:last-child { font-size:11px; opacity:.9; }
+
+    .pnl-card .card-body { padding:0 16px 20px 16px; margin-bottom:1cm; }
+    .pnl-card .title { font-size:16px; font-weight:700; text-transform:uppercase; }
+    .pnl-card .position {
+      margin:6px 0 8px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-size:13px;
+      font-weight:600;
+    }
+    .pnl-card .position .side { color:#ff6b6b; }
+    .pnl-card .position .divider {
+      width:1px; height:12px; background:#6a6a6a;
+      display:inline-block; transform:translateY(1px);
+    }
+    .pnl-card .position .lev { color:#b3b3b3; }
+    .pnl-card .pnl {
+      color:#0ecb81;
+      font-size:32px;
+      font-weight:700;
+      margin:8px 0;
+      letter-spacing:-.5px;
+    }
+    .pnl-card .usdt { font-size:16px; margin-left:4px; font-weight:600; color:#fff; }
+    .pnl-card .prices {
+      display:flex;
+      justify-content:space-between;
+      font-size:12px;
+      margin-top:8px;
+    }
+    .pnl-card .prices .label { color:#ddd; font-size:11px; }
+
+    .pnl-card .card-footer { background:#000; padding:0; display:block; position:relative; }
+    .pnl-card .footer-line { display:block; width:100%; height:1px; background:#444; margin:0; }
+    .pnl-card .footer-content {
+      padding:16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+
+    .pnl-card .footer-left{
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      line-height:1.1;
+      transform: translateX(-0.35cm);
+    }
+    .pnl-card .footer-left .binance-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:var(--badge-gap);
+      margin-bottom:2px;
+    }
+    .pnl-card .footer-left .binance-badge img{
+      width:var(--badge-icon); height:var(--badge-icon);
+    }
+    .pnl-card .footer-left .binance-badge .brand{
+      color:#fcd535;
+      font-weight:800;
+      letter-spacing:0;
+      margin-left:0;
+    }
+    .pnl-card .footer-left .futures-ref{
+      color:#fff;
+      padding-left: calc(var(--badge-icon) + var(--badge-gap));
+      text-indent: 0;
+      display:block;
+    }
+
+    .pnl-card .footer-left .binance-badge img{
+      transform: translateX(0.12cm);
+    }
+    .pnl-card .footer-left .futures-ref:last-child{
+      margin-top: 0.10cm;
+      transform: translateY(0);
+    }
+
+    .pnl-card .qr {
+      width:60px;
+      height:60px;
+      background:#fff;
+      border-radius:6px;
+      overflow:hidden;
+    }
+    .pnl-card .qr img { width:100%; height:100%; object-fit:cover; }
+
+    .pnl-underbar{
+      margin:14px auto 0;
+      width:calc(350px - 1cm);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      font-size:13px;
+    }
+    .pnl-underbar .selector {
+      margin:6px 0 10px;
+      display:flex;
+      justify-content:flex-start;
+      gap:20px;
+      font-size:13px;
+      transform:translateX(calc(-2cm + 1.5cm));
+    }
+    .pnl-underbar .selector label {
+      display:flex;
+      align-items:center;
+      gap:5px;
+      cursor:pointer;
+    }
+    .pnl-underbar .selector input[type="radio"] { accent-color:white; }
+    .pnl-underbar .bottom-bar {
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      margin-top:8px;
+      transform:translateX(-1.2cm);
+      align-self:center;
+    }
+    .pnl-underbar .action {
+      width:45px;
+      height:45px;
+      background:#1b1c22;
+      border:1px solid #2e2f37;
+      border-radius:12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      cursor:pointer;
+      transition:transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .pnl-underbar .action:hover {
+      transform:translateY(-2px);
+      background:#242632;
+      border-color:#3a3b47;
+    }
+    .pnl-underbar .action img {
+      width:18px;
+      height:18px;
+      display:block;
+    }
+    .pnl-underbar .action span {
+      font-size:10px;
+      color:#cfd3dc;
+    }
+
+    .pnl-card .one-glyph{
+      font-family: "Binance PLEX", Inter, "Segoe UI", system-ui, -apple-system, sans-serif !important;
+      font-weight: 700;
+      display:inline-block;
+      letter-spacing: 0;
+      transform: translateY(0.2px);
+    }
+    .no-one-stylize .one-glyph{
+      font-family: inherit !important;
+      font-weight: inherit !important;
+    }
+
+    .pnl-card .month-one{
+      font-size: .80em;
+      line-height: 1;
+      display:inline-block;
+      transform: translateY(.2px);
+    }
+
+    .pnl-card .prices .last{
+      transform: translateX(-2.3cm);
+    }
+    .pnl-card .prices .entry .label,
+    .pnl-card .prices .last  .label{
+      color:#939393 !important;
+    }
+
+    .pnl-card{
+      border:none !important;
+      box-shadow:none !important;
+    }
+    .pnl-card .card-footer .footer-left .binance-badge + .futures-ref{
+      font-size:16px !important;
+      font-weight:600 !important;
+      line-height:1.1 !important;
+      letter-spacing:0.2px !important;
+    }
+    .pnl-card .card-footer .footer-left .binance-badge + .futures-ref + .futures-ref{
+      font-size:12px !important;
+      font-weight:400 !important;
+    }
+    .pnl-card .card-footer .futures-ref .one-glyph{
+      font-family: "Binance PLEX", Inter, "Segoe UI", system-ui, -apple-system, sans-serif !important;
+      font-weight:700 !important;
+    }
+    .pnl-card .prices{ margin-top:14px !important; }
+    .pnl-card .prices .entry,
+    .pnl-card .prices .last{ margin-top:6px !important; }
+    .pnl-card .footer-left .binance-badge + .futures-ref{
+      margin-top:-4px !important;
+      transform:translateY(-2px) !important;
+    }
+  </style>
+
+  <style>
+    /* ✅ Lock Open Positions scroll vertically without shifting layout */
+    .feed,
+    .open-positions {
+      overflow-x: hidden !important;
+      overscroll-behavior-x: none !important;
+      touch-action: pan-y !important;
+      transform: translateZ(0);
+    }
+
+    .feed * {
+      max-width: 100% !important;
+      box-sizing: border-box;
+    }
+  </style>
+
+  <style>
+    /* 🎯 Align right edge of Open Positions panels */
+    .feed,
+    .open-positions {
+      margin-right: calc(var(--frame-gutter-x) * -1) !important;
+      margin-left: calc(var(--frame-gutter-x) * -1) !important;
+      padding-left: var(--frame-gutter-x) !important;
+      padding-right: var(--frame-gutter-x) !important;
+    }
+  </style>
+
+  <style>
+    /* 🎯 Fit Open Positions area exactly under 'Transfer' tab edges */
+    .feed,
+    .open-positions {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box;
+    }
+    .trade-panel {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box;
+    }
+  </style>
+
+  <style>
+    /* ✅ Fit only the Open Positions (.feed) section to full screen width */
+    .feed {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      margin-left: calc(50% - 50vw) !important;
+      margin-right: calc(50% - 50vw) !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+      overscroll-behavior-x: none !important;
+      touch-action: pan-y !important;
+      transform: translateZ(0);
+    }
+  </style>
+
+  <!-- ✅ FINAL ADJUSTMENTS: prevent overlap + bigger bottom icons -->
+  <style>
+    /* Positions scroll down → leave space above bottom nav icons */
+    .feed {
+      padding-bottom: calc(var(--bottom-nav-h) + 18px) !important;
+    }
+
+    /* Bigger bottom nav icons */
+    .bottom-nav .photo-slot--bottom {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+    }
+
+    .bottom-nav .photo-slot--bottom img {
+      width: 92%;
+      height: 92%;
+      margin: 4%;
+    }
+
+    /* Slightly larger labels */
+    .bottom-nav button span {
+      font-size: 11px;
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="top">
-      <h1>Auto Chart Pattern Signals</h1>
-      <span class="pill">Entry & red Stop-Loss arrows overlay</span>
-      <div class="next-pill">
-        <span id="nextBadge" class="next-badge">Next Entry: waiting…</span>
-        <div class="row">
-          <label class="tiny">Network</label>
-          <select id="netSel" title="Exchange">
-            <option value="binance">Binance (Spot)</option>
-          </select>
-        </div>
+    <div class="top-stack" id="topStack">
+      <header class="top-toggle" aria-label="Exchange or Wallet">
+        <span class="seg-thumb" aria-hidden="true"></span>
+        <button class="toggle-btn active" type="button">Exchange</button>
+        <button class="toggle-btn" type="button">Wallet</button>
+      </header>
+
+      <nav class="main-nav" aria-label="Main sections">
+        <button>Overview</button>
+        <button class="active">Futures</button>
+        <button>Spot</button>
+        <button>Funding</button>
+      </nav>
+
+      <div class="sub-toggle" role="tablist" aria-label="Futures type">
+        <button class="toggle-btn active" role="tab" aria-selected="true">USDⓢ-M</button>
+        <button class="toggle-btn" role="tab" aria-selected="false">COIN-M</button>
       </div>
     </div>
 
-    <aside class="side">
-      <div class="group">
-        <h3>Market</h3>
-        <div class="row">
-          <label>Symbol</label>
-          <input id="symbol" value="BTCUSDT" style="width:120px"/>
-          <label>Interval</label>
-          <select id="interval">
-            <option>1m</option><option>3m</option><option>5m</option><option selected>15m</option><option>30m</option>
-            <option>1h</option><option>2h</option><option>4h</option><option>6h</option><option>12h</option><option>1d</option>
-          </select>
-          <button id="load" class="btn-primary">Load</button>
-        </div>
-        <div class="hint">Uses Binance public REST/WebSocket to stream candles live.</div>
+    <section class="balance-panel" aria-label="Balances">
+      <div class="balance-header">
+        <span>Margin Balance <i id="eyeToggle" class="fas fa-eye" aria-hidden="true"></i></span>
+        <span class="icon-group" aria-label="Actions">
+          <label class="photo-slot photo-empty" data-slot="top-reward">
+            <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment">
+            <img alt="">
+          </label>
+          <label class="photo-slot photo-empty" data-slot="top-convert">
+            <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment">
+            <img alt="">
+          </label>
+          <label class="photo-slot photo-empty" data-slot="top-statement">
+            <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment">
+            <img alt="">
+          </label>
+        </span>
       </div>
 
-      <div class="group">
-        <h3>Patterns</h3>
-        <div class="row"><label><input type="checkbox" id="pivots" checked/> Swing Pivots</label></div>
-        <div class="row"><label><input type="checkbox" id="dbl" checked/> Double Top / Double Bottom</label></div>
-        <div class="row"><label><input type="checkbox" id="hs" checked/> Head & Shoulders</label></div>
-        <div class="row"><label><input type="checkbox" id="tl" checked/> Trendline Break</label></div>
-        <div class="divider"></div>
-        <div class="row">
-          <label>Pivot L/R</label><input id="pivotSpan" type="number" min="1" max="10" value="3" style="width:70px"/>
-          <label>Tolerance %</label><input id="tol" type="number" min="0.05" step="0.05" value="0.6" style="width:70px"/>
-        </div>
-        <div class="row">
-          <label>Risk Buffer %</label><input id="buf" type="number" step="0.05" value="0.25" style="width:70px"/>
-        </div>
-        <div class="row">
-          <button id="recalc" class="btn">Recalculate</button>
-          <button id="clearMarkers" class="btn">Clear arrows</button>
-        </div>
+      <div class="balance-amount">
+        <span id="amount" class="amount">Loading…</span>
+        <span class="currency">USD <i class="fas fa-chevron-down" aria-hidden="true"></i></span>
       </div>
 
-      <!-- =================== NEW: All Coins Market =================== -->
-      <div class="group">
-        <h3>All Coins Market (Spot)</h3>
-        <div class="marketbox">
-          <div class="market-toolbar">
-            <label class="tiny">Quote</label>
-            <select id="quoteSel" title="Quote filter">
-              <option value="USDT" selected>USDT</option>
-              <option value="FDUSD">FDUSD</option>
-              <option value="ALL">ALL</option>
-            </select>
-            <input id="marketSearch" placeholder="Search symbol…" />
-            <button id="sortBtn" class="pill-btn" title="Toggle sort">Sort: %</button>
-          </div>
-          <div class="mkt-head">
-            <div>Symbol</div><div>Last</div><div style="text-align:right">% 24h*</div>
-          </div>
-          <div id="marketList" class="mkt-list"></div>
+      <div class="realized-pnl" id="pnl">
+        Today’s Realized PNL
+        <span id="realizedSpan" class="gain">Loading…</span>
+        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      </div>
+
+      <div class="small-balances">
+        <div class="small-item">
+          <div class="label">Wallet Balance (USD)</div>
+          <div class="value" id="walletValue">Loading…</div>
         </div>
-        <div class="tiny">* % uses mini-ticker (close vs session open). Click any row to load its chart/WS.</div>
+        <div class="small-item">
+          <div class="label">Unrealized PNL (USD)</div>
+          <div class="value" id="unrealizedValue">Loading…</div>
+        </div>
       </div>
-      <!-- ============================================================ -->
+    </section>
 
-      <div class="group">
-        <h3>Notes</h3>
-        <div class="tiny">Green arrows = entries. <span style="color:var(--bad);font-weight:700">Red arrows = stop-loss</span>.
-          “NEXT” arrow previews the coming trigger and auto-promotes when crossed.</div>
-      </div>
-    </aside>
+    <section class="actions" aria-label="Quick actions">
+      <button class="btn primary active">Trade</button>
+      <button class="btn">Swap</button>
+      <button class="btn">Transfer</button>
+    </section>
 
-    <main class="main">
-      <div class="card" id="chart"></div>
-      <div class="card signals">
-        <table id="sigTable">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Pattern</th>
-              <th>Side</th>
-              <th>Entry</th>
-              <th>Stop</th>
-              <th>Neckline / Break</th>
-              <th>Comment</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <section class="positions" aria-label="Positions">
+      <nav class="sub-nav-2" id="stickyBar">
+        <button class="active">Positions</button>
+        <button>Assets</button>
+      </nav>
+
+      <div class="feed" id="feed">
+        <div class="empty-state" id="emptyState">
+          <i class="fa-solid fa-briefcase"></i>
+          <h4>You have no open positions</h4>
+          <p>Start a trade to see it listed here in real-time.</p>
+          <button class="cta"><i class="fa-solid fa-plus"></i> Open a Trade</button>
+        </div>
       </div>
-    </main>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Bottom navigation" id="bottomNav">
+      <button>
+        <label class="photo-slot photo-slot--bottom photo-empty" data-slot="nav-home">
+          <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment"><img alt="">
+        </label>
+        <span>Home</span>
+      </button>
+      <button>
+        <label class="photo-slot photo-slot--bottom photo-empty" data-slot="nav-markets">
+          <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment"><img alt="">
+        </label>
+        <span>Markets</span>
+      </button>
+      <button>
+        <label class="photo-slot photo-slot--bottom photo-empty" data-slot="nav-trade">
+          <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment"><img alt="">
+        </label>
+        <span>Trade</span>
+      </button>
+      <button>
+        <label class="photo-slot photo-slot--bottom photo-empty" data-slot="nav-futures">
+          <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment"><img alt="">
+        </label>
+        <span>Futures</span>
+      </button>
+      <button class="active">
+        <label class="photo-slot photo-slot--bottom photo-empty" data-slot="nav-assets">
+          <input type="file" accept=".jpg,.jpeg,image/jpeg" capture="environment"><img alt="">
+        </label>
+        <span>Assets</span>
+      </button>
+    </nav>
   </div>
 
-<script>
-(function(){
-  const d = (sel) => document.querySelector(sel);
-  const netSel = d('#netSel');
-  const symbolEl = d('#symbol');
-  const intervalEl = d('#interval');
-  const loadBtn = d('#load');
-  const recalcBtn = d('#recalc');
-  const clearBtn = d('#clearMarkers');
-  const tolEl = d('#tol');
-  const pivotSpanEl = d('#pivotSpan');
-  const bufEl = d('#buf');
-  const nextBadge = d('#nextBadge');
+  <!-- ===================== SHARE MODAL ===================== -->
+  <div class="pnl-modal-backdrop" id="pnlBackdrop" aria-hidden="true">
+    <div class="pnl-modal" role="dialog" aria-modal="true" aria-labelledby="pnlTitle">
+      <div class="pnl-scene">
 
-  // market panel controls
-  const quoteSel = d('#quoteSel');
-  const marketSearch = d('#marketSearch');
-  const marketList = d('#marketList');
-  const sortBtn = d('#sortBtn');
+        <!-- 3-slide carousel -->
+        <div class="pnl-carousel" id="pnlCarousel">
+          <div class="pnl-track" id="pnlTrack">
 
-  const opt = { dbl: d('#dbl'), hs: d('#hs'), tl: d('#tl') };
+            <!-- Slide 1 (Primary / with IDs) -->
+            <div class="pnl-slide">
+              <div class="pnl-card bg1" id="pnlCard">
+                <div class="card-header">
+                  <div class="avatar">
+                    <img src="https://iili.io/KithIm7.jpg" alt="User Avatar">
+                  </div>
+                  <div class="username">
+                    <span id="pnlUser">Prasadnuwankumara</span>
+                    <span id="pnlTime">—</span>
+                  </div>
+                </div>
 
-  let chart, series, markers = [], pendingMarkers = [], ws;           // kline WS
-  let candles = []; // {time, open, high, low, close}
+                <div class="card-body">
+                  <div class="title" id="pnlTitle">—</div>
+                  <div class="position">
+                    <span class="side" id="pnlSide">—</span>
+                    <span class="divider" aria-hidden="true"></span>
+                    <span class="lev" id="pnlLev">—</span>
+                  </div>
+                  <div class="pnl"><span id="pnlValue">0.00</span> <span class="usdt">USDT</span></div>
+                  <div class="prices">
+                    <div class="entry">
+                      <div class="label">Entry Price</div>
+                      <div id="pnlEntry">—</div>
+                    </div>
+                    <div class="last">
+                      <div class="label">Last Price</div>
+                      <div id="pnlLast">—</div>
+                    </div>
+                  </div>
+                </div>
 
-  let exSymbols = [];        // [{symbol, base, quote}]
-  let marketRows = new Map();// symbol -> row element
-  let miniWS = null;         // !miniTicker@arr stream
-  let sortMode = 'pct';      // 'pct' | 'az'
-  let selectedSymbol = 'BTCUSDT';
-  let repaintQueued = false;
+                <div class="card-footer">
+                  <span class="footer-line"></span>
+                  <div class="footer-content">
+                    <div class="footer-left">
+                      <div>
+                        <div class="binance-badge">
+                          <img src="https://iili.io/KBDmWsn.th.png" alt="Binance logo">
+                          <span class="brand">BINANCE</span>
+                        </div>
+                        <div class="futures-ref">FUTURES</div>
+                        <div class="futures-ref">Referral Code 475308515</div>
+                      </div>
+                    </div>
+                    <div class="qr">
+                      <img src="https://iili.io/KiDjqxt.png" alt="QR Code">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  // --- Chart setup
-  function initChart(){
-    if(chart){ chart.remove(); }
-    chart = LightweightCharts.createChart(document.getElementById('chart'),{
-      layout:{background:{color:'#0a111a'}, textColor:'#d7e1ee'},
-      rightPriceScale:{borderColor:'#263445'},
-      timeScale:{borderColor:'#263445'},
-      grid:{vertLines:{color:'#0f1824'}, horzLines:{color:'#0f1824'}},
-      crosshair:{mode: LightweightCharts.CrosshairMode.Normal},
+            <!-- Slide 2 (Clone, auto-synced) -->
+            <div class="pnl-slide">
+              <div class="pnl-card bg2">
+                <div class="card-header">
+                  <div class="avatar"><img src="https://iili.io/KithIm7.jpg" alt=""></div>
+                  <div class="username"><span class="js-user">—</span><span class="js-time">—</span></div>
+                </div>
+                <div class="card-body">
+                  <div class="title js-title">—</div>
+                  <div class="position">
+                    <span class="side js-side">—</span>
+                    <span class="divider"></span>
+                    <span class="lev js-lev">—</span>
+                  </div>
+                  <div class="pnl"><span class="js-pnl">0.00</span> <span class="usdt">USDT</span></div>
+                  <div class="prices">
+                    <div class="entry">
+                      <div class="label">Entry Price</div>
+                      <div class="js-entry">—</div>
+                    </div>
+                    <div class="last">
+                      <div class="label">Last Price</div>
+                      <div class="js-last">—</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <span class="footer-line"></span>
+                  <div class="footer-content">
+                    <div class="footer-left">
+                      <div>
+                        <div class="binance-badge"><img src="https://iili.io/KBDmWsn.th.png" alt=""><span class="brand">BINANCE</span></div>
+                        <div class="futures-ref">FUTURES</div>
+                        <div class="futures-ref">Referral Code 475308515</div>
+                      </div>
+                    </div>
+                    <div class="qr"><img src="https://iili.io/KiDjqxt.png" alt=""></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3 (Clone, auto-synced) -->
+            <div class="pnl-slide">
+              <div class="pnl-card bg3">
+                <div class="card-header">
+                  <div class="avatar"><img src="https://iili.io/KithIm7.jpg" alt=""></div>
+                  <div class="username"><span class="js-user">—</span><span class="js-time">—</span></div>
+                </div>
+                <div class="card-body">
+                  <div class="title js-title">—</div>
+                  <div class="position">
+                    <span class="side js-side">—</span>
+                    <span class="divider"></span>
+                    <span class="lev js-lev">—</span>
+                  </div>
+                  <div class="pnl"><span class="js-pnl">0.00</span> <span class="usdt">USDT</span></div>
+                  <div class="prices">
+                    <div class="entry">
+                      <div class="label">Entry Price</div>
+                      <div class="js-entry">—</div>
+                    </div>
+                    <div class="last">
+                      <div class="label">Last Price</div>
+                      <div class="js-last">—</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <span class="footer-line"></span>
+                  <div class="footer-content">
+                    <div class="footer-left">
+                      <div>
+                        <div class="binance-badge"><img src="https://iili.io/KBDmWsn.th.png" alt=""><span class="brand">BINANCE</span></div>
+                        <div class="futures-ref">FUTURES</div>
+                        <div class="futures-ref">Referral Code 475308515</div>
+                      </div>
+                    </div>
+                    <div class="qr"><img src="https://iili.io/KiDjqxt.png" alt=""></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /pnl-track -->
+        </div><!-- /pnl-carousel -->
+
+        <div class="pnl-underbar">
+          <div class="selector">
+            <label><input type="radio" name="infoMode" value="PNL" checked> PNL</label>
+            <label><input type="radio" name="infoMode" value="ROI"> ROI</label>
+            <label><input type="radio" name="infoMode" value="BOTH"> PNL & ROI</label>
+          </div>
+
+          <div class="bottom-bar" id="pnlActions">
+            <div class="action" title="Save"><img src="https://img.icons8.com/ios-glyphs/60/download--v1.png" alt="Save"><span>Save</span></div>
+            <div class="action" title="Copy"><img src="https://img.icons8.com/ios-glyphs/60/link--v1.png" alt="Copy"><span>Copy</span></div>
+            <div class="action" title="Telegram"><img src="https://img.icons8.com/color/60/telegram-app--v1.png" alt="Telegram"><span>Telegram</span></div>
+            <div class="action" title="Instagram"><img src="https://img.icons8.com/color/60/instagram-new--v1.png" alt="Instagram"><span>Instagram</span></div>
+            <div class="action" title="More"><img src="https://img.icons8.com/ios-glyphs/60/more.png" alt="More"><span>More</span></div>
+          </div>
+        </div>
+      </div><!-- /pnl-scene -->
+    </div>
+  </div>
+  <!-- =================== / SHARE MODAL =================== -->
+
+  <script>
+    /* ===== VisualViewport-based vh fix (iOS Safari) ===== */
+    function setVh(){
+      const h = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
+      document.documentElement.style.setProperty('--vh', h + 'px');
+    }
+    setVh();
+    window.addEventListener('resize', setVh);
+    if (window.visualViewport) visualViewport.addEventListener('resize', setVh);
+
+    /* ===== Segmented control ===== */
+    (function(){
+      const wrap = document.querySelector('.app .top-toggle');
+      const btns  = [...wrap.querySelectorAll('.toggle-btn')];
+      const thumb = wrap.querySelector('.seg-thumb');
+      const setActive = (i) => {
+        btns.forEach((b,idx)=> b.classList.toggle('active', idx===i));
+        thumb.style.transform = `translateX(${i*100}%)`;
+      };
+      setActive(0);
+      btns.forEach((b,i)=> b.addEventListener('click',()=>setActive(i)));
+    })();
+
+    /* ===== Layout sizing ===== */
+    function sizeFeed(){
+      const feed = document.getElementById('feed');
+      const stickyBar = document.getElementById('stickyBar');
+      const bottomNav = document.getElementById('bottomNav');
+      const topStack  = document.getElementById('topStack');
+      if(!feed || !stickyBar || !bottomNav || !topStack) return;
+
+      const vhVar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) || (window.innerHeight * 0.01);
+      const viewportH = vhVar * 100;
+
+      const topOffset = Math.ceil(topStack.getBoundingClientRect().height + 8);
+      stickyBar.style.top = topOffset + 'px';
+
+      const barH = stickyBar.getBoundingClientRect().height || 40;
+      const bottomH = bottomNav.getBoundingClientRect().height || 56;
+
+      const available = viewportH - (topOffset + barH) - bottomH - 12;
+      feed.style.height = Math.max(120, available) + 'px';
+      feed.style.maxHeight = feed.style.height;
+    }
+    window.addEventListener('resize', sizeFeed);
+    document.addEventListener('DOMContentLoaded', sizeFeed);
+
+    /* ===== Top panel utils ===== */
+    const fmtMoney = (n) =>
+      "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtPct = (n) => (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+
+    const amountEl = document.getElementById("amount");
+    const walletEl = document.getElementById("walletValue");
+    const unrealEl = document.getElementById("unrealizedValue");
+    const realizedSpan = document.getElementById("realizedSpan");
+    const eye = document.getElementById("eyeToggle");
+
+    let showTop = true;
+    let realizedTodayUSD = 0;
+    let realizedTodayPct = 0;
+    let walletBalance = 0;
+    let unrealizedSum = 0;
+    let targetMarginBalance = 0;
+
+    function refreshTop(){
+      amountEl.textContent   = showTop ? fmtMoney(targetMarginBalance) : "•••••••";
+      walletEl.textContent   = showTop ? fmtMoney(walletBalance) : "•••••••";
+      unrealEl.textContent   = showTop ? fmtMoney(unrealizedSum) : "•••••••";
+      realizedSpan.textContent = showTop
+        ? `${fmtMoney(realizedTodayUSD)} (${fmtPct(realizedTodayPct)})`
+        : "•••••••";
+    }
+    eye.addEventListener("click", ()=>{
+      showTop = !showTop;
+      eye.classList.toggle("fa-eye-slash", !showTop);
+      eye.classList.toggle("fa-eye", showTop);
+      refreshTop();
     });
-    series = chart.addCandlestickSeries({
-      upColor:'#16a34a', downColor:'#ef4444',
-      borderUpColor:'#16a34a', borderDownColor:'#ef4444',
-      wickUpColor:'#16a34a', wickDownColor:'#ef4444'
-    });
-  }
 
-  // --- Binance endpoints
-  const BIN_REST = (symbol, interval, limit=1000) => `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
-  const BIN_WS = (symbol, interval) => `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`;
-  const EXCHANGE_INFO = 'https://api.binance.com/api/v3/exchangeInfo';
-
-  async function loadCandles(symbol, interval){
-    const url = BIN_REST(symbol, interval);
-    const res = await fetch(url);
-    const arr = await res.json();
-    candles = arr.map(k => ({ time: Math.floor(k[0]/1000), open:+k[1], high:+k[2], low:+k[3], close:+k[4] }));
-    series.setData(candles);
-    applyDetections();
-    renderNextPending();
-  }
-
-  function openWS(symbol, interval){
-    if(ws){ try{ ws.close(); }catch(e){} }
-    ws = new WebSocket(BIN_WS(symbol, interval));
-    ws.onmessage = (ev)=>{
-      const msg = JSON.parse(ev.data);
-      if(!msg.k) return;
-      const k = msg.k;
-      const c = { time: Math.floor(k.t/1000), open:+k.o, high:+k.h, low:+k.l, close:+k.c };
-      const last = candles[candles.length-1];
-      if(last && last.time === c.time){ candles[candles.length-1] = c; }
-      else { candles.push(c); }
-      series.update(c);
-      renderNextPending();      // live preview
-      if(k.x) applyDetections();// on candle close
+    /* ===== Helper fns ===== */
+    const numberWithCommas = (x) => String(x).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const toFixedSafe = (n, dp) => {
+      const num = Number(n);
+      if (!Number.isFinite(num)) return (0).toFixed(dp);
+      const m = Math.pow(10, dp);
+      return (Math.round(num * m) / m).toFixed(dp);
     };
-  }
-
-  // --- Utilities
-  const pct = (a,b)=> ((a-b)/b)*100;
-  const within = (a,b,tolPct)=> Math.abs(pct(a,b)) <= tolPct;
-
-  // Find swing pivots
-  function findPivots(src, span){
-    const highs=[], lows=[];
-    for(let i=span;i<src.length-span;i++){
-      let isHigh=true, isLow=true;
-      for(let j=i-span;j<=i+span;j++){
-        if(src[j].high > src[i].high) isHigh=false;
-        if(src[j].low < src[i].low) isLow=false;
-        if(!isHigh && !isLow) break;
-      }
-      if(isHigh) highs.push({i, price:src[i].high, time:src[i].time});
-      if(isLow) lows.push({i, price:src[i].low, time:src[i].time});
+    const dpFromTick = (tickStr) => {
+      const idx = (tickStr || '').indexOf('.');
+      if (idx === -1) return 0;
+      return tickStr.length - idx - 1;
+    };
+    const quantizeToTick = (price, tickSize) => {
+      const step = parseFloat(tickSize);
+      if (!isFinite(price) || !isFinite(step) || step <= 0) return price;
+      return Math.round(price / step) * step;
+    };
+    const quantizeDownToStep = (qty, stepSize) => {
+      const step = parseFloat(stepSize);
+      if (!isFinite(qty) || !isFinite(step) || step <= 0) return qty;
+      return Math.floor(qty / step) * step;
+    };
+    function joinIntDec(i, d) {
+      const I = numberWithCommas(i);
+      return d !== undefined ? I + '.' + d : I;
     }
-    return {highs,lows};
-  }
+    function shuffle(arr){
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1)) + 0;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+    const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-  // --------- Pattern detectors (unchanged core) ----------
-  function detectDouble(src, piv, tolPct, bufPct){
-    const out=[];
-    // Tops
-    for(let a=0; a<piv.highs.length; a++){
-      for(let b=a+1; b<Math.min(a+60, piv.highs.length); b++){
-        const A=piv.highs[a], B=piv.highs[b];
-        if(within(A.price,B.price,tolPct)){
-          const midLows = piv.lows.filter(x=> x.i>A.i && x.i<B.i);
-          if(midLows.length===0) continue;
-          const neck = midLows.reduce((m,x)=> x.price<m?x.price:m, Infinity);
-          for(let i=B.i+1;i<src.length;i++){
-            if(src[i].close < neck * (1 - bufPct/100)){
-              out.push({ type:'Double Top', side:'short', entry:src[i].close, stop:Math.max(A.price,B.price)*(1+bufPct/100), time:src[i].time, ctx:{A,B,neck} });
-              break;
+    function formatProfit(_sym, x) {
+      const s = toFixedSafe(x, 2);
+      const [i, d] = s.split('.');
+      return joinIntDec(i, d);
+    }
+    function formatSignedProfit(sym, x){
+      const abs = Math.abs(Number(x) || 0);
+      return (x >= 0 ? '+' : '-') + formatProfit(sym, abs);
+    }
+    function formatTwoDP(x) {
+      const s = toFixedSafe(x, 2);
+      const [i, d] = s.split('.');
+      return joinIntDec(i, d);
+    }
+
+    /* ====== photo-slot logic ====== */
+    const SLOT_KEY_PREFIX = 'photo_slot_';
+    const DEFAULT_URLS = {
+      'top-reward':   'https://iili.io/KngDpJn.th.jpg',
+      'top-convert':  'https://iili.io/KnrIabj.th.jpg',
+      'top-statement':'https://iili.io/KnrTeyu.th.jpg',
+      'nav-home':    'https://iili.io/Knrf9eV.th.jpg',
+      'nav-markets': 'https://iili.io/KnrA1s4.th.jpg',
+      'nav-trade':   'https://iili.io/KnragO7.th.jpg',
+      'nav-futures': 'https://iili.io/Knrla3v.th.jpg',
+      'nav-assets':  'https://iili.io/Knr1Jse.th.jpg'
+    };
+    function loadSlot(id){
+      try { return localStorage.getItem(SLOT_KEY_PREFIX + id) || ''; }
+      catch { return ''; }
+    }
+    function saveSlot(id, dataURL){
+      try { localStorage.setItem(SLOT_KEY_PREFIX + id, dataURL); }
+      catch {}
+    }
+    function initPhotoSlots(){
+      document.querySelectorAll('.photo-slot').forEach(slot=>{
+        const key = slot.dataset.slot;
+        const img = slot.querySelector('img');
+        const input = slot.querySelector('input[type="file"]');
+        const saved = loadSlot(key);
+        if (saved) {
+          img.src = saved;
+          slot.classList.remove('photo-empty');
+        } else if (DEFAULT_URLS[key]) {
+          img.src = DEFAULT_URLS[key];
+          slot.classList.remove('photo-empty');
+        }
+        input.addEventListener('change', (e)=>{
+          const file = e.target.files && e.target.files[0];
+          if(!file) return;
+          const ok = /jpe?g$/i.test(file.name) || file.type === 'image/jpeg';
+          if(!ok){
+            alert('Please upload a JPG (.jpg or .jpeg)');
+            e.target.value='';
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = () => {
+            img.src = reader.result;
+            slot.classList.remove('photo-empty');
+            saveSlot(key, reader.result);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+    }
+
+    /* ===== Exchange / calculations / WS / panels ===== */
+
+    const round2 = (x) => Math.round((Number(x)||0) * 100) / 100;
+
+    /*** 🔧 ACCOUNT TARGETS (per your constraints) ***/
+    const TRADE_MIN = 25, TRADE_MAX = 30;
+    const WALLET_MIN = 5000, WALLET_MAX = 10000;
+    const MB_MIN = 20000, MB_MAX = 50000;
+    const DAILY_PNL_MIN = 50, DAILY_PNL_MAX = 1500;
+
+    /*** PERSISTENCE KEYS — keep disabled so values randomize on load ***/
+    const STORAGE_TRADES_KEY = 'fa_trades_v4_refreshEveryLoad';
+    const FORCE_NEW_SESSION = true;
+
+    function saveTrades(){
+      if (FORCE_NEW_SESSION) return;
+      const data = trades.map(t => ({
+        sym: t.sym,
+        leverage: t.leverage,
+        entry: t.entry,
+        usedMargin: t.usedMargin,
+        effMargin: t.effMargin,
+        mmr: t.mmr,
+        qty: t.qty,
+        side: t.side,
+        marginMode: t.marginMode
+      }));
+      try { localStorage.setItem(STORAGE_TRADES_KEY, JSON.stringify(data)); } catch {}
+    }
+    function loadTrades(){
+      if (FORCE_NEW_SESSION) return null;
+      try{
+        const raw = localStorage.getItem(STORAGE_TRADES_KEY);
+        if(!raw) return null;
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr) || !arr.length) return null;
+        return arr;
+      }catch{ return null; }
+    }
+
+    const marketMeta = Object.create(null);
+    async function loadExchangeMeta() {
+      const url = 'https://fapi.binance.com/fapi/v1/exchangeInfo';
+      try{
+        const res = await fetch(url);
+        const json = await res.json();
+        if (!json || !Array.isArray(json.symbols)) return;
+        for (const s of json.symbols) {
+          const sym = s.symbol;
+          if (allSymbols.indexOf(sym) === -1) continue;
+          let tickSize = '0.01', stepSize = '0.001', minQty = 0;
+          if (Array.isArray(s.filters)) {
+            for (const f of s.filters) {
+              if (f.filterType === 'PRICE_FILTER' && f.tickSize) tickSize = f.tickSize;
+              if ((f.filterType === 'LOT_SIZE' || f.filterType === 'MARKET_LOT_SIZE') && f.stepSize) stepSize = f.stepSize;
+              if ((f.filterType === 'LOT_SIZE' || f.filterType === 'MARKET_LOT_SIZE') && f.minQty) minQty = parseFloat(f.minQty) || 0;
+            }
+          }
+          marketMeta[sym] = {
+            tickSize,
+            stepSize,
+            minQty,
+            priceDp: dpFromTick(tickSize)
+          };
+        }
+      }catch(e){ }
+    }
+    const getMeta = (sym) => marketMeta[sym] || { tickSize: '0.01', stepSize: '0.001', minQty: 0, priceDp: 2 };
+    function formatPrice(sym, x) {
+      const m = getMeta(sym);
+      const q = quantizeToTick(x, m.tickSize);
+      const s = toFixedSafe(q, m.priceDp);
+      const [i, d] = s.split('.');
+      return joinIntDec(i, d);
+    }
+
+    const primeSymbols = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','TONUSDT','ADAUSDT','AVAXUSDT','TRXUSDT','LINKUSDT','DOTUSDT','NEARUSDT','OPUSDT','ARBUSDT','APTUSDT','INJUSDT','RNDRUSDT','SEIUSDT','TIAUSDT','ONDOUSDT'];
+    const seedSymbols = ['BTCUSDT','ETHUSDT','BNBUSDT','ADAUSDT','SOLUSUT','SOLUSDT','XRPUSDT','DOTUSDT','LTCUSDT','LINKUSDT','DOGEUSDT','AAVEUSDT','SUSHIUSDT','SHIBUSDT','COMPUSDT','ETCUSDT','ZECUSDT','XMRUSDT','LRCUSDT','QNTUSDT','CRVUSDT','UNIUSDT','BCHUSDT','XLMUSDT','ATOMUSDT','MATICUSDT','AVAXUSDT','TRXUSDT','EOSUSDT','NEARUSDT','FILUSDT','OPUSDT','ARBUSDT','APTUSDT','SUIUSDT','INJUSDT','RNDRUSDT','GALAUSDT','THETAUSDT','SANDUSDT','MANAUSDT','AXSUSDT','CFXUSDT','ICPUSDT','LDOUSDT','PEPEUSDT','FLOKIUSDT','WIFUSDT','ARKUSDT','IOTAUSDT','KASUSDT','PYTHUSDT','STRKUSDT','JUPUSDT','APEUSDT','BLURUSDT','SEIUSDT','TIAUSDT','TONUSDT','ONDOUSDT'];
+    const allSymbols = Array.from(new Set([...primeSymbols, ...seedSymbols]));
+
+    const maintenanceMarginRates = {
+      BTCUSDT:0.004, ETHUSDT:0.005, BNBUSDT:0.005, ADAUSDT:0.010, SOLUSDT:0.008,
+      XRPUSDT:0.010, DOTUSDT:0.010, LTCUSDT:0.010, LINKUSDT:0.010, DOGEUSDT:0.012,
+      AAVEUSDT:0.010, SUSHIUSDT:0.015, SHIBUSDT:0.020, COMPUSDT:0.010, ETCUSDT:0.010,
+      ZECUSDT:0.015, XMRUSDT:0.020, LRCUSDT:0.020, QNTUSDT:0.015, CRVUSDT:0.020,
+      UNIUSDT:0.010, BCHUSDT:0.010, XLMUSDT:0.015, ATOMUSDT:0.010, MATICUSDT:0.010,
+      AVAXUSDT:0.010, TRXUSDT:0.020, EOSUSDT:0.015, NEARUSDT:0.020, FILUSDT:0.015,
+      OPUSDT:0.015, ARBUSDT:0.020, APTUSDT:0.015, SUIUSDT:0.020, INJUSDT:0.015,
+      RNDRUSDT:0.015, GALAUSDT:0.025, THETAUSDT:0.020, SANDUSDT:0.020, MANAUSDT:0.020,
+      AXSUSDT:0.020, CFXUSDT:0.025, ICPUSDT:0.015, LDOUSDT:0.020, PEPEUSDT:0.030,
+      FLOKIUSDT:0.030, WIFUSDT:0.030, ARKUSDT:0.020, IOTAUSDT:0.020, KASUSDT:0.025,
+      PYTHUSDT:0.020, STRKUSDT:0.020, JUPUSDT:0.020, APEUSDT:0.020, BLURUSDT:0.020,
+      SEIUSDT:0.020, TIAUSDT:0.020, TONUSDT:0.015, ONDOUSDT:0.020
+    };
+    const getMaintRate = (sym) => maintenanceMarginRates[sym] ?? 0.01;
+
+    const qtyFrom = (marginUsed, leverage, entry) => (leverage * marginUsed) / entry;
+    const upnlLong  = (mark, entry, qty) => (mark - entry) * qty;
+    const upnlShort = (mark, entry, qty) => (entry - mark) * qty;
+    const roiPct = (pnl, usedMargin) => (pnl / usedMargin) * 100;
+    const maintenance = (mmr, mark, qty) => mmr * mark * qty;
+    const marginBalanceCalc = (effectiveMargin, uPnL) => effectiveMargin + uPnL;
+
+    function liqPriceLong(entry, leverage, mmr, marginUsed, effectiveMargin) {
+      const Q = (leverage * marginUsed) / entry;
+      const denom = Q * (1 - mmr);
+      const num = Q * entry - effectiveMargin;
+      if (denom <= 0) return null;
+      const P = num / denom;
+      if (!isFinite(P) || P <= 0) return null;
+      return P;
+    }
+    function liqPriceShort(entry, leverage, mmr, marginUsed, effectiveMargin) {
+      const Q = (leverage * marginUsed) / entry;
+      const denom = Q * (1 + mmr);
+      const num = effectiveMargin + Q * entry;
+      if (denom <= 0) return null;
+      const P = num / denom;
+      if (!isFinite(P) || P <= 0) return null;
+      return P;
+    }
+    const marginRatioPct = (maint, mBal) => {
+      const mb = Number(mBal);
+      if (!isFinite(mb) || mb <= 0) return 100;
+      const r = (maint / mb) * 100;
+      return Math.max(0, Math.min(9999, r));
+    };
+
+    const feedDiv = document.getElementById('feed');
+    function meterBars(){
+      const totalBars = 4;
+      const greenBars = Math.floor(Math.random() * totalBars) + 1;
+      let html='';
+      for(let j=0;j<totalBars;j++){
+        html += `<span class="${j<greenBars?'green':''}"></span>`;
+      }
+      return html;
+    }
+
+    function createPanel({ sym, leverage, entry, mark, usedMargin, effMargin, mmr, qty, side, marginMode }) {
+      const pnl = side === 'LONG'
+        ? upnlLong(mark, entry, qty)
+        : upnlShort(mark, entry, qty);
+      const roi = roiPct(pnl, usedMargin);
+      const maint = maintenance(mmr, mark, qty);
+      const mBal = marginBalanceCalc(effMargin, pnl);
+      const mRatio = marginRatioPct(maint, mBal);
+      const liq = side === 'LONG'
+        ? liqPriceLong(entry, leverage, mmr, usedMargin, effMargin)
+        : liqPriceShort(entry, leverage, mmr, usedMargin, effMargin);
+      const sideIcon = side === 'LONG'
+        ? '<span class="icon-buy">B</span>'
+        : '<span class="icon-sell">S</span>';
+      const sizeUSDT = mark * qty;
+
+      const panel = document.createElement('div');
+      panel.className = 'trade-panel';
+      panel.innerHTML = `
+        <div class="header">
+          ${sideIcon}
+          <span class="symbol">${sym}</span>
+          <span class="tag">PERP</span>
+          <span class="tag">${marginMode} ${leverage}×</span>
+          <span class="exclamations">${meterBars()}</span>
+          <i class="fas fa-share-nodes share" title="Share PNL"></i>
+        </div>
+        <div class="content-columns">
+          <div class="column">
+            <div class="stat">
+              <div class="label">PNL (USDT)</div>
+              <div class="value pnl ${pnl < 0 ? 'red' : 'green'}">${formatSignedProfit(sym, pnl)}</div>
+            </div>
+            <div class="stat">
+              <div class="label">Size (USDT)</div>
+              <div class="value size">${formatTwoDP(sizeUSDT)}</div>
+            </div>
+            <div class="stat">
+              <div class="label">Entry Price (USDT)</div>
+              <div class="value entry">${formatPrice(sym, entry)}</div>
+            </div>
+          </div>
+          <div class="column center">
+            <div class="stat">
+              <div class="label no-line">Margin (USDT)</div>
+              <div class="value margin">${formatTwoDP(usedMargin)}</div>
+            </div>
+            <div class="stat">
+              <div class="label no-line">Mark Price (USDT)</div>
+              <div class="value mark">${formatPrice(sym, mark)}</div>
+            </div>
+          </div>
+          <div class="column right">
+            <div class="stat">
+              <div class="label">ROI</div>
+              <div class="value percent roi ${roi < 0 ? 'red' : 'green'}">${(roi >= 0 ? '+' : '') + toFixedSafe(roi, 2)}%</div>
+            </div>
+            <div class="stat margin-ratio">
+              <div class="label">Margin Ratio</div>
+              <div class="value percent margin-ratio-value ${mRatio >= 80 ? 'red' : 'green'}">${toFixedSafe(mRatio, 2)}%</div>
+            </div>
+            <div class="stat">
+              <div class="label no-line">Liq. Price (USDT)</div>
+              <div class="value liq">${liq === null ? '—' : formatPrice(sym, liq)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="tp-actions">
+          <button class="tp-btn">Leverage</button>
+          <button class="tp-btn">TP/SL</button>
+          <button class="tp-btn">Close</button>
+          <button class="tp-btn">Reverse</button>
+        </div>`;
+
+      const panelState = {
+        node: panel,
+        sym,
+        leverage,
+        mmr,
+        entry,
+        usedMargin,
+        effMargin,
+        qty,
+        mark,
+        side,
+        marginMode,
+        lockLoss:false,
+        isBalancer:false
+      };
+      panel.querySelector('.share')
+        .addEventListener('click', ()=> openPNLModal(panelState));
+      return panelState;
+    }
+
+    function renderTrade(t) {
+      const pnl = t.side === 'LONG'
+        ? upnlLong(t.mark, t.entry, t.qty)
+        : upnlShort(t.mark, t.entry, t.qty);
+      const roi = roiPct(pnl, t.usedMargin);
+      const maintV = maintenance(t.mmr, t.mark, t.qty);
+      const mBal = marginBalanceCalc(t.effMargin, pnl);
+      const mRatio = marginRatioPct(maintV, mBal);
+      const liq = t.side === 'LONG'
+        ? liqPriceLong(t.entry, t.leverage, t.mmr, t.usedMargin, t.effMargin)
+        : liqPriceShort(t.entry, t.leverage, t.mmr, t.usedMargin, t.effMargin);
+
+      const pnlEl = t.node.querySelector('.value.pnl');
+      pnlEl.textContent = formatSignedProfit(t.sym, pnl);
+      pnlEl.classList.toggle('green', pnl >= 0);
+      pnlEl.classList.toggle('red', pnl < 0);
+
+      t.node.querySelector('.value.mark').textContent = formatPrice(t.sym, t.mark);
+      t.node.querySelector('.value.size').textContent = formatTwoDP(t.mark * t.qty);
+
+      const roiEl = t.node.querySelector('.value.roi');
+      roiEl.textContent = (roi >= 0 ? '+' : '') + toFixedSafe(roi, 2) + '%';
+      roiEl.classList.toggle('green', roi >= 0);
+      roiEl.classList.toggle('red', roi < 0);
+
+      const mrEl = t.node.querySelector('.value.margin-ratio-value');
+      mrEl.textContent = toFixedSafe(mRatio, 2) + '%';
+      mrEl.classList.toggle('green', mRatio < 80);
+      mrEl.classList.toggle('red', mRatio >= 80);
+
+      const liqEl = t.node.querySelector('.value.liq');
+      liqEl.textContent = (liq === null) ? '—' : formatPrice(t.sym, liq);
+
+      if (currentSharedTrade === t) updatePNLCardFromTrade(t);
+    }
+
+    function approxTwoMonthsAgoMs(){
+      const d=new Date();
+      const jitterDays = randInt(58, 62);
+      d.setDate(d.getDate()-jitterDays);
+      d.setHours(0,0,0,0);
+      return d.getTime();
+    }
+
+    async function fetchEntryFromTwoMonths(sym, startMs){
+      try{
+        const url1=`https://fapi.binance.com/fapi/v1/markPriceKlines?symbol=${sym}&interval=1d&startTime=${startMs-2*24*3600*1000}&limit=2`;
+        const res1=await fetch(url1);
+        if(res1.ok){
+          const data=await res1.json();
+          if(Array.isArray(data)&&data.length>0){
+            const k=data[0];
+            const close=parseFloat(k[4]);
+            if(isFinite(close)) return close;
+          }
+        }
+      }catch{}
+      try{
+        const url2=`https://fapi.binance.com/fapi/v1/continuousKlines?pair=${sym}&contractType=PERPETUAL&interval=1d&startTime=${startMs-2*24*3600*1000}&limit=2`;
+        const res2=await fetch(url2);
+        if(res2.ok){
+          const data=await res2.json();
+          if(Array.isArray(data)&&data.length>0){
+            const k=data[0];
+            const close=parseFloat(k[4]);
+            if(isFinite(close)) return close;
+          }
+        }
+      }catch{}
+      try{
+        const url3=`https://fapi.binance.com/fapi/v1/klines?symbol=${sym}&interval=1d&startTime=${startMs-2*24*3600*1000}&limit=2`;
+        const res3=await fetch(url3);
+        if(res3.ok){
+          const data=await res3.json();
+          if(Array.isArray(data)&&data.length>0){
+            const k=data[0];
+            const close=parseFloat(k[4]);
+            if(isFinite(close)) return close;
+          }
+        }
+      }catch{}
+      return null;
+    }
+
+    async function loadTwoMonthEntryMap(symbolList){
+      const start=approxTwoMonthsAgoMs();
+      const entryMap=Object.create(null);
+      const unique=[...new Set(symbolList)];
+      const batch=8;
+      for(let i=0;i<unique.length;i+=batch){
+        const chunk=unique.slice(i,i+batch);
+        await Promise.all(chunk.map(async (sym)=>{
+          const close=await fetchEntryFromTwoMonths(sym,start);
+          if(isFinite(close)) entryMap[sym]=close;
+        }));
+      }
+      return entryMap;
+    }
+
+    const trades=[];
+    let symbols=shuffle(allSymbols.slice());
+    const TRADE_COUNT = randInt(TRADE_MIN, TRADE_MAX);
+
+    function shuffleFeed(){
+      const nodes=Array.from(feedDiv.children);
+      nodes.filter(n=>n.id!=='emptyState')
+           .forEach(n=>feedDiv.appendChild(n));
+    }
+
+    async function seedWithTwoMonthEntries(){
+      const empty=document.getElementById("emptyState");
+      if(empty) empty.remove();
+
+      await loadExchangeMeta();
+
+      const res=await fetch('https://fapi.binance.com/fapi/v1/premiumIndex');
+      const arr=await res.json();
+      const markMap=Object.create(null);
+      arr.forEach(o=>{
+        if(o && o.symbol) markMap[o.symbol]=parseFloat(o.markPrice);
+      });
+
+      symbols = symbols.filter(s=>!!marketMeta[s]);
+      const poolForEntry=Array.from(
+        new Set([...primeSymbols, ...symbols.slice(0, TRADE_COUNT*2)])
+      );
+      const entryMap=await loadTwoMonthEntryMap(poolForEntry);
+
+      const MARGIN_MIN=50, MARGIN_MAX=200;
+      const mainList=primeSymbols.filter(
+        s=>marketMeta[s]&&isFinite(markMap[s])&&isFinite(entryMap[s])
+      );
+      const otherList=symbols.filter(
+        s=>!primeSymbols.includes(s)&&marketMeta[s]&&isFinite(markMap[s])&&isFinite(entryMap[s])
+      );
+      const planned=[...mainList, ...otherList].slice(0, TRADE_COUNT);
+      const LEV_SET = [10,20,50,100,125];
+
+      for(let i=0;i<planned.length;i++){
+        const sym=planned[i];
+        const liveMark=markMap[sym];
+        if(!isFinite(liveMark)) continue;
+        const entryRaw=entryMap[sym];
+        if(!isFinite(entryRaw)) continue;
+
+        const leverage = LEV_SET[Math.floor(Math.random()*LEV_SET.length)];
+        const entry=quantizeToTick(entryRaw, getMeta(sym).tickSize);
+
+        const side=(liveMark >= entry) ? 'LONG' : 'SHORT';
+
+        let usedMargin=(MARGIN_MIN + Math.random()*(MARGIN_MAX - MARGIN_MIN));
+        const m=getMeta(sym);
+        let qtyRaw=qtyFrom(usedMargin, leverage, entry);
+        let qty=quantizeDownToStep(qtyRaw, m.stepSize);
+        if(qty < m.minQty) qty = m.minQty;
+
+        const marginMode = Math.random() < 0.5 ? 'Cross' : 'Isolated';
+        let effMargin = (marginMode === 'Isolated')
+          ? usedMargin
+          : usedMargin * (1.2 + Math.random() * 1.5);
+
+        const panelState = createPanel({
+          sym, leverage, entry, mark: liveMark,
+          usedMargin, effMargin, mmr: getMaintRate(sym),
+          qty, side, marginMode
+        });
+
+        trades.push(panelState);
+        feedDiv.appendChild(panelState.node);
+      }
+
+      shuffleFeed();
+      sizeFeed();
+    }
+
+    function recalcAccountTopFromTrades(){
+      let sum=0;
+      for(const t of trades){
+        const pnl = t.side==='LONG'
+          ? upnlLong(t.mark, t.entry, t.qty)
+          : upnlShort(t.mark, t.entry, t.qty);
+        sum += pnl;
+      }
+      unrealizedSum = round2(sum);
+      targetMarginBalance = round2(walletBalance + unrealizedSum);
+      refreshTop();
+    }
+
+    function enforceTradeCount(){
+      if(trades.length > TRADE_MAX){
+        const extra = trades.length - TRADE_MAX;
+        for(let i=0;i<extra;i++){
+          const t = trades.pop();
+          t.node.remove();
+        }
+      }
+    }
+
+    function clampTradeMargins(){
+      for(const t of trades){
+        if(t.usedMargin < 50) t.usedMargin = 50;
+        if(t.usedMargin > 200) t.usedMargin = 200;
+        if(t.effMargin < t.usedMargin) t.effMargin = t.usedMargin;
+      }
+    }
+
+    function adjustTradesToTargetUnreal(targetUnreal){
+      if(!trades.length) return;
+
+      let currentUnreal = 0;
+      for(const t of trades){
+        const pnl = t.side==='LONG'
+          ? upnlLong(t.mark, t.entry, t.qty)
+          : upnlShort(t.mark, t.entry, t.qty);
+        currentUnreal += pnl;
+      }
+      currentUnreal = round2(currentUnreal);
+      const diff = targetUnreal - currentUnreal;
+      if(Math.abs(diff) < 0.01){
+        unrealizedSum = targetUnreal;
+        return;
+      }
+
+      const perTrade = diff / trades.length;
+      for(const t of trades){
+        const cur = t.side==='LONG'
+          ? upnlLong(t.mark, t.entry, t.qty)
+          : upnlShort(t.mark, t.entry, t.qty);
+        const desired = cur + perTrade;
+        let newMark;
+        if(t.side==='LONG'){
+          newMark = t.entry + (desired / t.qty);
+        } else {
+          newMark = t.entry - (desired / t.qty);
+        }
+        newMark = quantizeToTick(newMark, getMeta(t.sym).tickSize);
+        t.mark = newMark;
+        renderTrade(t);
+      }
+
+      let check = 0;
+      trades.forEach(t=>{
+        const pnl = t.side==='LONG'
+          ? upnlLong(t.mark, t.entry, t.qty)
+          : upnlShort(t.mark, t.entry, t.qty);
+        check += pnl;
+      });
+      unrealizedSum = round2(check);
+    }
+
+    function connectFuturesMarkWS(){
+      const WS_URL='wss://fstream.binance.com/ws/!markPrice@arr';
+      let ws=new WebSocket(WS_URL);
+      ws.onopen=()=>console.log('[WS] Connected');
+      ws.onmessage=(evt)=>{
+        let data;
+        try{ data=JSON.parse(evt.data);}
+        catch{return;}
+        if(!Array.isArray(data)) return;
+        let touched=false;
+        for(const o of data){
+          const sym=o.s;
+          const priceStr=o.p;
+          if(!sym || priceStr===undefined) continue;
+          const mp=parseFloat(priceStr);
+          if(!isFinite(mp)) continue;
+          for(const t of trades){
+            if(t.sym===sym){
+              t.mark=mp;
+              renderTrade(t);
+              touched=true;
             }
           }
         }
-      }
-    }
-    // Bottoms
-    for(let a=0; a<piv.lows.length; a++){
-      for(let b=a+1; b<Math.min(a+60, piv.lows.length); b++){
-        const A=piv.lows[a], B=piv.lows[b];
-        if(within(A.price,B.price,tolPct)){
-          const midHighs = piv.highs.filter(x=> x.i>A.i && x.i<B.i);
-          if(midHighs.length===0) continue;
-          const neck = midHighs.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
-          for(let i=B.i+1;i<src.length;i++){
-            if(src[i].close > neck * (1 + bufPct/100)){
-              out.push({ type:'Double Bottom', side:'long', entry:src[i].close, stop:Math.min(A.price,B.price)*(1-bufPct/100), time:src[i].time, ctx:{A,B,neck} });
-              break;
-            }
-          }
-        }
-      }
-    }
-    return out;
-  }
-
-  function detectHS(src, piv, tolPct, bufPct){
-    const out=[];
-    const H=piv.highs;
-    for(let i=0;i<H.length-2;i++){
-      const L=H[i], Hd=H[i+1], R=H[i+2];
-      if(!(L.i < Hd.i && Hd.i < R.i)) continue;
-      if(!(Hd.price > L.price && Hd.price > R.price)) continue;
-      if(!within(L.price,R.price, tolPct*1.2)) continue;
-      const lowsBetween1 = piv.lows.filter(x=> x.i>L.i && x.i<Hd.i);
-      const lowsBetween2 = piv.lows.filter(x=> x.i>Hd.i && x.i<R.i);
-      if(!lowsBetween1.length || !lowsBetween2.length) continue;
-      const n1 = lowsBetween1.reduce((m,x)=> x.price<m?x.price:m, Infinity);
-      const n2 = lowsBetween2.reduce((m,x)=> x.price<m?x.price:m, Infinity);
-      const neck = Math.min(n1,n2);
-      for(let j=R.i+1;j<src.length;j++){
-        if(src[j].close < neck * (1 - bufPct/100)){
-          out.push({ type:'Head & Shoulders', side:'short', entry:src[j].close, stop:R.price*(1+bufPct/100), time:src[j].time, ctx:{L,Hd,R,neck} });
-          break;
-        }
-      }
-    }
-    // Inverse H&S
-    const LL=piv.lows;
-    for(let i=0;i<LL.length-2;i++){
-      const Ls=LL[i], Hd=LL[i+1], Rs=LL[i+2];
-      if(!(Ls.i < Hd.i && Hd.i < Rs.i)) continue;
-      if(!(Hd.price < Ls.price && Hd.price < Rs.price)) continue;
-      if(!within(Ls.price,Rs.price, tolPct*1.2)) continue;
-      const highsBetween1 = piv.highs.filter(x=> x.i>Ls.i && x.i<Hd.i);
-      const highsBetween2 = piv.highs.filter(x=> x.i>Hd.i && x.i<Rs.i);
-      if(!highsBetween1.length || !highsBetween2.length) continue;
-      const n1 = highsBetween1.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
-      const n2 = highsBetween2.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
-      const neck = Math.max(n1,n2);
-      for(let j=Rs.i+1;j<src.length;j++){
-        if(src[j].close > neck * (1 + bufPct/100)){
-          out.push({ type:'Inverse H&S', side:'long', entry:src[j].close, stop:Rs.price*(1-bufPct/100), time:src[j].time, ctx:{Ls,Hd,Rs,neck} });
-          break;
-        }
-      }
-    }
-    return out;
-  }
-
-  function detectTrendBreak(src, piv, bufPct){
-    const out=[];
-    if(piv.highs.length>=2){
-      const h1=piv.highs[piv.highs.length-2], h2=piv.highs[piv.highs.length-1];
-      const m=(h2.price-h1.price)/(h2.i-h1.i);
-      for(let i=h2.i+1;i<src.length;i++){
-        const tl = h2.price + m*(i-h2.i);
-        if(src[i].close > tl * (1 + bufPct/100)){
-          const low = piv.lows.filter(x=> x.i<i).slice(-1)[0];
-          out.push({ type:'Trendline Break', side:'long', entry:src[i].close, stop:(low? low.price : src[i].low)*(1-bufPct/100), time:src[i].time, ctx:{kind:'downTL'} });
-          break;
-        }
-      }
-    }
-    if(piv.lows.length>=2){
-      const l1=piv.lows[piv.lows.length-2], l2=piv.lows[piv.lows.length-1];
-      const m=(l2.price-l1.price)/(l2.i-l1.i);
-      for(let i=l2.i+1;i<src.length;i++){
-        const tl = l2.price + m*(i-l2.i);
-        if(src[i].close < tl * (1 - bufPct/100)){
-          const high = piv.highs.filter(x=> x.i<i).slice(-1)[0];
-          out.push({ type:'Trendline Break', side:'short', entry:src[i].close, stop:(high? high.price : src[i].high)*(1+bufPct/100), time:src[i].time, ctx:{kind:'upTL'} });
-          break;
-        }
-      }
-    }
-    return out;
-  }
-
-  function addArrowMarkers(signals){
-    const mks=[];
-    for(const s of signals){
-      const entryShape = s.side==='long' ? 'arrowUp' : 'arrowDown';
-      const stopShape  = s.side==='long' ? 'arrowDown' : 'arrowUp';
-      mks.push({ time: s.time, position: 'inBar', color: '#22c55e', shape: entryShape, text: `${s.type} ${s.side==='long'?'LONG':'SHORT'} entry`, size: 2, price: s.entry });
-      mks.push({ time: s.time, position: 'inBar', color: '#ef4444', shape: stopShape,  text: `Stop @ ${s.stop.toFixed(6)}`, size: 2, price: s.stop  });
-    }
-    markers = markers.concat(mks);
-    series.setMarkers(markers.concat(pendingMarkers));
-  }
-
-  function pushSignalsToTable(signals){
-    const tb = document.querySelector('#sigTable tbody');
-    for(const s of signals){
-      const tr = document.createElement('tr');
-      const t = new Date(s.time*1000).toLocaleString();
-      tr.innerHTML = `
-        <td class="muted">${t}</td>
-        <td>${s.type}</td>
-        <td>${s.side==='long'?'<span class="badge long">LONG</span>':'<span class="badge short">SHORT</span>'}</td>
-        <td>${s.entry.toFixed(6)}</td>
-        <td style="color:var(--bad);font-weight:700">${s.stop.toFixed(6)}</td>
-        <td class="muted">${s.ctx?.neck? (s.ctx.neck.toFixed? s.ctx.neck.toFixed(6): s.ctx.neck) : (s.ctx?.kind||'')}</td>
-        <td class="muted">auto-detected</td>
-      `;
-      tb.prepend(tr);
-    }
-  }
-
-  function applyDetections(){
-    const span = Math.max(2, (+d('#pivotSpan').value|0) || 3);
-    const tolPct = Math.max(0.05, +tolEl.value || 0.6);
-    const bufPct = Math.max(0.01, +bufEl.value || 0.25);
-
-    const piv = findPivots(candles, span);
-
-    let signals=[];
-    if(opt.dbl.checked) signals = signals.concat(detectDouble(candles, piv, tolPct, bufPct));
-    if(opt.hs.checked)  signals = signals.concat(detectHS(candles, piv, tolPct, bufPct));
-    if(opt.tl.checked)  signals = signals.concat(detectTrendBreak(candles, piv, bufPct));
-
-    if(signals.length){
-      const seen = new Set(markers.filter(m=>m.text?.includes('entry')).map(m=> m.time+'|'+m.text));
-      const fresh = signals.filter(s=> !seen.has(s.time+'|'+`${s.type} ${s.side==='long'?'LONG':'SHORT'} entry`));
-      if(fresh.length){
-        addArrowMarkers(fresh);
-        pushSignalsToTable(fresh);
-      }
-    }
-  }
-
-  function clearAllMarkers(){
-    markers=[]; pendingMarkers=[]; series.setMarkers([]);
-    document.querySelector('#sigTable tbody').innerHTML='';
-    nextBadge.textContent = 'Next Entry: waiting…';
-  }
-
-  // ---------- PENDING (NEXT ENTRY) preview ----------
-  function computePending(src, piv, tolPct, bufPct){
-    const out=[]; const n = src.length; const last = src[n-1];
-    if(!last) return out;
-
-    // Double Top/Bottom (recent)
-    if(opt.dbl.checked){
-      for(let a=Math.max(0,piv.highs.length-6); a<piv.highs.length; a++){
-        for(let b=a+1; b<piv.highs.length; b++){
-          const A=piv.highs[a], B=piv.highs[b];
-          if(!A||!B||B.i<=A.i) continue;
-          if(within(A.price,B.price,tolPct)){
-            const midLows = piv.lows.filter(x=> x.i>A.i && x.i<B.i);
-            if(!midLows.length) continue;
-            const neck = midLows.reduce((m,x)=> x.price<m?x.price:m, Infinity);
-            const trigger = neck * (1 - bufPct/100);
-            const stop = Math.max(A.price,B.price) * (1 + bufPct/100);
-            if(last.close >= trigger){
-              out.push({score:B.time, type:'Double Top', side:'short', trigger, stop, setupTime:B.time, ctx:{A,B,neck}});
-            }
-          }
-        }
-      }
-      for(let a=Math.max(0,piv.lows.length-6); a<piv.lows.length; a++){
-        for(let b=a+1; b<piv.lows.length; b++){
-          const A=piv.lows[a], B=piv.lows[b];
-          if(!A||!B||B.i<=A.i) continue;
-          if(within(A.price,B.price,tolPct)){
-            const midHighs = piv.highs.filter(x=> x.i>A.i && x.i<B.i);
-            if(!midHighs.length) continue;
-            const neck = midHighs.reduce((m,x)=> x.price>m?x.price:m, -Infinity);
-            const trigger = neck * (1 + bufPct/100);
-            const stop = Math.min(A.price,B.price) * (1 - bufPct/100);
-            if(last.close <= trigger){
-              out.push({score:B.time, type:'Double Bottom', side:'long', trigger, stop, setupTime:B.time, ctx:{A,B,neck}});
-            }
-          }
-        }
-      }
+        if(touched) recalcAccountTopFromTrades();
+      };
+      ws.onclose=()=>{
+        console.warn('[WS] Closed. Reconnecting in 2s…');
+        setTimeout(connectFuturesMarkWS, 2000);
+      };
+      ws.onerror=(err)=>{
+        console.error('[WS] Error', err);
+        try{ ws.close(); }catch{}
+      };
     }
 
-    // H&S
-    if(opt.hs.checked){
-      const H=piv.highs;
-      for(let i=Math.max(0,H.length-8); i<H.length-2; i++){
-        const L=H[i], Hd=H[i+1], R=H[i+2];
-        if(!(L&&Hd&&R) || !(L.i<Hd.i && Hd.i<R.i)) continue;
-        if(!(Hd.price > L.price && Hd.price > R.price)) continue;
-        if(!within(L.price,R.price, tolPct*1.2)) continue;
-        const lowsBetween1 = piv.lows.filter(x=> x.i>L.i && x.i<Hd.i);
-        const lowsBetween2 = piv.lows.filter(x=> x.i>Hd.i && x.i<R.i);
-        if(!lowsBetween1.length || !lowsBetween2.length) continue;
-        const neck = Math.min(
-          lowsBetween1.reduce((m,x)=> x.price<m?x.price:m, Infinity),
-          lowsBetween2.reduce((m,x)=> x.price<m?x.price:m, Infinity)
-        );
-        const trigger = neck * (1 - bufPct/100);
-        const stop = R.price*(1+bufPct/100);
-        if(last.close >= trigger){
-          out.push({score:R.time, type:'Head & Shoulders', side:'short', trigger, stop, setupTime:R.time, ctx:{L,Hd,R,neck}});
-        }
-      }
-      // Inverse
-      const LL=piv.lows;
-      for(let i=Math.max(0,LL.length-8); i<LL.length-2; i++){
-        const Ls=LL[i], Hd=LL[i+1], Rs=LL[i+2];
-        if(!(Ls&&Hd&&Rs) || !(Ls.i<Hd.i && Hd.i<Rs.i)) continue;
-        if(!(Hd.price < Ls.price && Hd.price < Rs.price)) continue;
-        if(!within(Ls.price,Rs.price, tolPct*1.2)) continue;
-        const highsBetween1 = piv.highs.filter(x=> x.i>Ls.i && x.i<Hd.i);
-        const highsBetween2 = piv.highs.filter(x=> x.i>Hd.i && x.i<Rs.i);
-        if(!highsBetween1.length || !highsBetween2.length) continue;
-        const neck = Math.max(
-          highsBetween1.reduce((m,x)=> x.price>m?x.price:m, -Infinity),
-          highsBetween2.reduce((m,x)=> x.price>m?x.price:m, -Infinity)
-        );
-        const trigger = neck * (1 + bufPct/100);
-        const stop = Rs.price*(1-bufPct/100);
-        if(last.close <= trigger){
-          out.push({score:Rs.time, type:'Inverse H&S', side:'long', trigger, stop, setupTime:Rs.time, ctx:{Ls,Hd,Rs,neck}});
-        }
-      }
+    function setBottomInset(){
+      const nav = document.getElementById('bottomNav');
+      const h = nav
+        ? Math.max(56, Math.ceil(nav.getBoundingClientRect().height))
+        : 64;
+      document.documentElement.style.setProperty('--bottom-nav-h', h + 'px');
+    }
+    window.addEventListener('resize', setBottomInset);
+    document.addEventListener('DOMContentLoaded', setBottomInset);
+
+    const pnlEls = {
+      backdrop: document.getElementById('pnlBackdrop'),
+      title: document.getElementById('pnlTitle'),
+      side: document.getElementById('pnlSide'),
+      lev: document.getElementById('pnlLev'),
+      pnl: document.getElementById('pnlValue'),
+      entry: document.getElementById('pnlEntry'),
+      last: document.getElementById('pnlLast'),
+      time: document.getElementById('pnlTime'),
+      user: document.getElementById('pnlUser')
+    };
+    let currentSharedTrade = null;
+    const usernameStatic = 'Chiranthamadhushan';
+
+    function nowStamp(){
+      const d=new Date();
+      const pad=(n)=>String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    // Trendline
-    if(opt.tl.checked){
-      if(piv.highs.length>=2){
-        const h1=piv.highs[piv.highs.length-2], h2=piv.highs[piv.highs.length-1];
-        const m=(h2.price-h1.price)/(h2.i-h1.i);
-        const i = src.length-1;
-        const tl = h2.price + m*(i-h2.i);
-        const trigger = tl * (1 + bufPct/100);
-        const low = piv.lows.filter(x=> x.i<i).slice(-1)[0];
-        const stop = (low?low.price:src[i].low) * (1 - bufPct/100);
-        if(src[i].close <= trigger){
-          out.push({score:h2.time, type:'Trendline Break', side:'long', trigger, stop, setupTime:h2.time, ctx:{kind:'downTL*'}});
-        }
-      }
-      if(piv.lows.length>=2){
-        const l1=piv.lows[piv.lows.length-2], l2=piv.lows[piv.lows.length-1];
-        const m=(l2.price-l1.price)/(l2.i-l1.i);
-        const i = src.length-1;
-        const tl = l2.price + m*(i-l2.i);
-        const trigger = tl * (1 - bufPct/100);
-        const high = piv.highs.filter(x=> x.i<i).slice(-1)[0];
-        const stop = (high?high.price:src[i].high) * (1 + bufPct/100);
-        if(src[i].close >= trigger){
-          out.push({score:l2.time, type:'Trendline Break', side:'short', trigger, stop, setupTime:l2.time, ctx:{kind:'upTL*'}});
-        }
-      }
+    function formatTimeWithTinyMonthOne(ts){
+      const m = ts.match(/^(\d{4})-(\d{2})-(\d{2}) (.+)$/);
+      if(!m) return ts;
+      const [, Y, MM, DD, rest] = m;
+      const mm = (MM.charAt(0) === '1')
+        ? `<span class="month-one">1</span>${MM.charAt(1)}`
+        : MM;
+      return `${Y}-${mm}-${DD} ${rest}`;
     }
 
-    out.sort((a,b)=> b.score - a.score);
-    return out[0] ? [out[0]] : [];
-  }
-
-  function renderNextPending(){
-    const span = Math.max(2, (+d('#pivotSpan').value|0) || 3);
-    const tolPct = Math.max(0.05, +tolEl.value || 0.6);
-    const bufPct = Math.max(0.01, +bufEl.value || 0.25);
-    if(candles.length<span*3){ return; }
-
-    const piv = findPivots(candles, span);
-    const nextCandidates = computePending(candles, piv, tolPct, bufPct);
-
-    pendingMarkers = [];
-    if(nextCandidates.length){
-      const s = nextCandidates[0];
-      const entryShape = s.side==='long' ? 'arrowUp' : 'arrowDown';
-      const stopShape  = s.side==='long' ? 'arrowDown' : 'arrowUp';
-      const t = candles[candles.length-1].time;
-
-      pendingMarkers.push({ time:t, position:'inBar', color:'#22c55e', shape:entryShape, size:1, text:`NEXT ${s.side==='long'?'LONG':'SHORT'} @ ${s.trigger.toFixed(6)} • ${s.type}`, price:s.trigger });
-      pendingMarkers.push({ time:t, position:'inBar', color:'#ef4444', shape:stopShape,  size:1, text:`SL ${s.stop.toFixed(6)} (pending)`, price:s.stop });
-
-      nextBadge.textContent = `Next Entry: ${s.side.toUpperCase()} @ ${s.trigger.toFixed(6)} (${s.type}) • SL ${s.stop.toFixed(6)}`;
-    } else {
-      nextBadge.textContent = 'Next Entry: waiting…';
+    function applyUSDTVisibility(mode){
+      const showUSDT = mode !== 'ROI';
+      document.querySelectorAll('.pnl-card .usdt').forEach(el=>{
+        el.style.display = showUSDT ? '' : 'none';
+      });
     }
-    series.setMarkers(markers.concat(pendingMarkers));
 
-    // Promote if crossed
-    if(nextCandidates.length){
-      const s = nextCandidates[0];
-      const last = candles[candles.length-1];
-      const crossed = (s.side==='long') ? (last.close > s.trigger) : (last.close < s.trigger);
-      if(crossed){
-        const triggered = [{ type: s.type, side: s.side, entry: last.close, stop: s.stop, time: last.time, ctx: s.ctx }];
-        addArrowMarkers(triggered);
-        pushSignalsToTable(triggered);
-        pendingMarkers = [];
-        series.setMarkers(markers);
-        nextBadge.textContent = 'Next Entry: waiting…';
-      }
+    function syncCloneSlides(payload){
+      const cards = Array.from(document.querySelectorAll('.pnl-card'))
+        .filter(c=>c.id!=='pnlCard');
+      cards.forEach(card=>{
+        const set = (sel, val, html=false) => {
+          const el = card.querySelector(sel);
+          if(!el) return;
+          if(html) el.innerHTML = val;
+          else el.textContent = val;
+        };
+        set('.js-user', payload.user);
+        set('.js-time', payload.timeHTML, true);
+        set('.js-title', payload.title);
+        set('.js-side', payload.sideText);
+        card.querySelector('.js-side').style.color = payload.sideColor;
+        set('.js-lev', payload.lev);
+        set('.js-pnl', payload.pnlText);
+        set('.js-entry', payload.entry);
+        set('.js-last', payload.last);
+        if (window.__wrapOnes) window.__wrapOnes(card);
+      });
     }
-  }
 
-  // ======================= All Coins Market =======================
-  async function loadExchangeInfo(){
-    const res = await fetch(EXCHANGE_INFO);
-    const info = await res.json();
-    exSymbols = info.symbols
-      .filter(s => s.status === 'TRADING' && s.isSpotTradingAllowed)
-      .map(s => ({ symbol:s.symbol, base:s.baseAsset, quote:s.quoteAsset }));
-    buildMarketList();      // initial DOM
-    openMiniTicker();       // live updates
-  }
-
-  function buildMarketList(){
-    marketList.innerHTML = '';
-    marketRows.clear();
-
-    const q = quoteSel.value;
-    const term = marketSearch.value.trim().toUpperCase();
-
-    const filtered = exSymbols.filter(x => {
-      const byQuote = (q==='ALL') ? true : (x.quote === q);
-      const byTerm  = term ? (x.symbol.includes(term) || x.base.includes(term)) : true;
-      return byQuote && byTerm;
+    function openPNLModal(trade){
+      setBottomInset();
+      currentSharedTrade = trade;
+      pnlEls.user.textContent = usernameStatic;
+      const ts = nowStamp();
+      pnlEls.time.innerHTML = formatTimeWithTinyMonthOne(ts);
+      updatePNLCardFromTrade(trade);
+      pnlEls.backdrop.classList.add('open');
+      pnlEls.backdrop.setAttribute('aria-hidden','false');
+      setSlide(0, true);
+    }
+    function closePNLModal(){
+      pnlEls.backdrop.classList.remove('open');
+      pnlEls.backdrop.setAttribute('aria-hidden','true');
+      currentSharedTrade = null;
+    }
+    pnlEls.backdrop.addEventListener('click', (e)=>{
+      if(e.target === pnlEls.backdrop) closePNLModal();
     });
 
-    // Create rows (empty values, to be filled by WS)
-    for(const x of filtered){
-      const row = document.createElement('div');
-      row.className = 'mkt-row';
-      row.dataset.symbol = x.symbol;
-      row.dataset.price = '0';
-      row.dataset.pct = '0';
-      row.innerHTML = `
-        <div class="mkt-sym">${x.symbol}</div>
-        <div class="mkt-price">—</div>
-        <div class="mkt-chg chg-up">0.00%</div>
-      `;
-      row.onclick = ()=> selectMarketSymbol(x.symbol);
-      marketList.appendChild(row);
-      marketRows.set(x.symbol, row);
-    }
-    sortMarketList();
-    highlightActiveRow();
-  }
+    document.querySelectorAll('input[name="infoMode"]').forEach(r=>{
+      r.addEventListener('change', ()=>{
+        const mode = (document.querySelector('input[name="infoMode"]:checked')||{}).value || 'PNL';
+        applyUSDTVisibility(mode);
+        if(currentSharedTrade) updatePNLCardFromTrade(currentSharedTrade);
+      });
+    });
 
-  function sortMarketList(){
-    const rows = Array.from(marketList.children);
-    if(sortMode === 'pct'){
-      rows.sort((a,b)=> (+b.dataset.pct) - (+a.dataset.pct));
-    } else {
-      rows.sort((a,b)=> a.dataset.symbol.localeCompare(b.dataset.symbol));
-    }
-    rows.forEach(r=> marketList.appendChild(r));
-  }
+    function updatePNLCardFromTrade(t){
+      if(!t) return;
+      const pnl = t.side === 'LONG'
+        ? upnlLong(t.mark, t.entry, t.qty)
+        : upnlShort(t.mark, t.entry, t.qty);
+      const roi = roiPct(pnl, t.usedMargin);
+      const sideTxt = t.side === 'LONG' ? 'Long' : 'Short';
 
-  function queueRepaint(){
-    if(repaintQueued) return;
-    repaintQueued = true;
-    requestAnimationFrame(()=>{ repaintQueued=false; sortMarketList(); highlightActiveRow(); });
-  }
+      pnlEls.title.textContent = `${t.sym} Perpetual`;
+      pnlEls.side.textContent = sideTxt;
+      pnlEls.side.style.color = t.side === 'LONG' ? '#0ecb81' : '#ff6b6b';
+      pnlEls.lev.textContent = `${t.leverage}x`;
 
-  function highlightActiveRow(){
-    const rows = marketList.querySelectorAll('.mkt-row');
-    rows.forEach(r => r.classList.toggle('active', r.dataset.symbol === selectedSymbol));
-  }
-
-  function openMiniTicker(){
-    if(miniWS){ try{ miniWS.close(); }catch(e){} }
-    miniWS = new WebSocket('wss://stream.binance.com:9443/ws/!miniTicker@arr');
-    miniWS.onmessage = (ev)=>{
-      let msg = JSON.parse(ev.data);
-      const arr = Array.isArray(msg) ? msg : (Array.isArray(msg.data) ? msg.data : []);
-      if(!arr.length) return;
-
-      // Update rows we have in DOM
-      for(const t of arr){
-        const sym = t.s; // symbol
-        const row = marketRows.get(sym);
-        if(!row) continue; // not in current filter
-        const last = +t.c, open = +t.o;
-        if(!isFinite(last) || !isFinite(open) || open===0) continue;
-        const change = ((last - open) / open) * 100;
-
-        row.dataset.price = last;
-        row.dataset.pct = change.toFixed(2);
-
-        const priceEl = row.children[1];
-        const pctEl = row.children[2];
-        priceEl.textContent = last.toString();
-        pctEl.textContent = (change>=0? '+' : '') + change.toFixed(2) + '%';
-        pctEl.className = 'mkt-chg ' + (change>=0 ? 'chg-up' : 'chg-dn');
+      const mode = (document.querySelector('input[name="infoMode"]:checked')||{}).value || 'PNL';
+      let pnlText;
+      if(mode === 'PNL') {
+        pnlText = formatSignedProfit(t.sym, pnl);
+      } else if(mode === 'ROI') {
+        pnlText = (roi>=0?'+':'') + toFixedSafe(roi,2) + '%';
+      } else {
+        pnlText = `${formatSignedProfit(t.sym, pnl)}  (${(roi>=0?'+':'')+toFixedSafe(roi,2)}%)`;
       }
-      // Don’t sort on every tick; batch with rAF
-      queueRepaint();
-    };
-  }
+      pnlEls.pnl.textContent = pnlText;
+      pnlEls.pnl.parentElement.style.color = pnl >= 0 ? '#0ecb81' : '#e04b4a';
+      pnlEls.entry.textContent = formatPrice(t.sym, t.entry);
+      pnlEls.last.textContent  = formatPrice(t.sym, t.mark);
 
-  function selectMarketSymbol(sym){
-    selectedSymbol = sym;
-    symbolEl.value = sym;
-    loadBtn.click();
-    highlightActiveRow();
-  }
+      applyUSDTVisibility(mode);
 
-  // UI handlers for market panel
-  quoteSel.onchange = buildMarketList;
-  marketSearch.oninput = ()=>{
-    // tiny debounce
-    clearTimeout(marketSearch._t);
-    marketSearch._t = setTimeout(buildMarketList, 150);
-  };
-  sortBtn.onclick = ()=>{
-    sortMode = (sortMode==='pct') ? 'az' : 'pct';
-    sortBtn.textContent = 'Sort: ' + (sortMode==='pct' ? '%' : 'A–Z');
-    sortMarketList();
-  };
-  // ===============================================================
+      const payload = {
+        user: usernameStatic,
+        timeHTML: pnlEls.time.innerHTML,
+        title: pnlEls.title.textContent,
+        sideText: sideTxt,
+        sideColor: t.side === 'LONG' ? '#0ecb81' : '#ff6b6b',
+        lev: `${t.leverage}x`,
+        pnlText,
+        entry: pnlEls.entry.textContent,
+        last: pnlEls.last.textContent
+      };
+      syncCloneSlides(payload);
 
-  // --- Wire chart UI
-  loadBtn.onclick = async()=>{
-    const sym = symbolEl.value.trim().toUpperCase();
-    const tf = intervalEl.value.trim();
-    selectedSymbol = sym;
-    initChart();
-    await loadCandles(sym, tf);
-    openWS(sym, tf);
-    highlightActiveRow();
-  };
-  d('#recalc').onclick = ()=>{ applyDetections(); renderNextPending(); };
-  d('#clearMarkers').onclick = clearAllMarkers;
+      if (window.__wrapOnes)
+        window.__wrapOnes(document.getElementById('pnlCard'));
+    }
 
-  // Bootstrap default
-  (async function bootstrap(){
-    initChart();
-    selectedSymbol = symbolEl.value.trim().toUpperCase();
-    await loadExchangeInfo();    // fills the market panel
-    loadBtn.click();             // loads default chart + kline WS
-  })();
-})();
-</script>
-</body>
-</html>
-<!-- partial -->
-  
+    function setupSaveOnlyCard() {
+      const saveBtn = Array.from(
+        document.querySelectorAll('#pnlActions .action')
+      ).find(a => a.getAttribute('title') === 'Save');
+      if(!saveBtn) return;
+      saveBtn.addEventListener('click', async () => {
+        const card = document.getElementById('pnlCard');
+        if(!card) return;
+        try{
+          const canvas = await html2canvas(card, {
+            useCORS:true,
+            scale:2,
+            backgroundColor:null
+          });
+          const dataURL = canvas.toDataURL('image/png');
+          const a = document.createElement('a');
+          a.href = dataURL;
+          a.download = `PNL_Card_${nowStamp().replace(/[: ]/g,'_')}.png`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }catch(e){
+          alert('Save failed. Please try again.');
+        }
+      });
+    }
+
+    const track = document.getElementById('pnlTrack');
+    const carousel = document.getElementById('pnlCarousel');
+    let slideIndex = 0;
+    let startX = 0, currentX = 0, isDown = false;
+
+    function setSlide(i, instant=false){
+      slideIndex = Math.max(0, Math.min(2, i));
+      const w = carousel.getBoundingClientRect().width;
+      track.style.transition = instant ? 'none' : 'transform .25s ease';
+      track.style.transform = `translateX(${-slideIndex * w}px)`;
+      if(instant){
+        requestAnimationFrame(
+          ()=> track.style.transition = 'transform .25s ease'
+        );
+      }
+    }
+
+    function onDown(e){
+      isDown = true;
+      carousel.classList.add('grabbing');
+      startX = ('touches' in e) ? e.touches[0].clientX : e.clientX;
+    }
+    function onMove(e){
+      if(!isDown) return;
+      currentX = ('touches' in e) ? e.touches[0].clientX : e.clientX;
+      const dx = currentX - startX;
+      const w = carousel.getBoundingClientRect().width;
+      const base = -slideIndex * w;
+      track.style.transition = 'none';
+      track.style.transform = `translateX(${base + dx}px)`;
+    }
+    function onUp(){
+      if(!isDown) return;
+      isDown = false;
+      carousel.classList.remove('grabbing');
+      const w = carousel.getBoundingClientRect().width;
+      const m = track.style.transform.match(/-?\d+(\.\d+)?px/);
+      const tx = m ? parseFloat(m[0]) : 0;
+      const moved = tx + slideIndex * w;
+      if (Math.abs(moved) > w * 0.2){
+        setSlide(slideIndex + (moved < 0 ? 1 : -1));
+      } else {
+        setSlide(slideIndex);
+      }
+    }
+
+    carousel.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    carousel.addEventListener('touchstart', onDown, {passive:true});
+    carousel.addEventListener('touchmove', onMove, {passive:true});
+    carousel.addEventListener('touchend', onUp);
+
+    (async function init(){
+      sizeFeed();
+      setBottomInset();
+      initPhotoSlots();
+
+      try {
+        if (FORCE_NEW_SESSION) localStorage.removeItem(STORAGE_TRADES_KEY);
+      } catch {}
+
+      await loadExchangeMeta();
+
+      try{
+        const res=await fetch('https://fapi.binance.com/fapi/v1/premiumIndex');
+        await res.json();
+      }catch{}
+
+      await seedWithTwoMonthEntries();
+
+      enforceTradeCount();
+      clampTradeMargins();
+
+      walletBalance = randInt(WALLET_MIN, WALLET_MAX);
+      targetMarginBalance = randInt(MB_MIN, MB_MAX);
+      const desiredUnreal = round2(targetMarginBalance - walletBalance);
+
+      realizedTodayUSD = randInt(DAILY_PNL_MIN, DAILY_PNL_MAX);
+      realizedTodayPct = walletBalance > 0
+        ? (realizedTodayUSD / walletBalance) * 100
+        : 0;
+
+      adjustTradesToTargetUnreal(desiredUnreal);
+
+      recalcAccountTopFromTrades();
+
+      connectFuturesMarkWS();
+      setupSaveOnlyCard();
+      setSlide(0, true);
+
+      applyUSDTVisibility(
+        (document.querySelector('input[name="infoMode"]:checked')||{}).value || 'PNL'
+      );
+    })();
+
+    document.getElementById("amount").textContent = "Loading…";
+    document.getElementById("walletValue").textContent = "Loading…";
+    document.getElementById("unrealizedValue").textContent = "Loading…";
+    document.getElementById("realizedSpan").textContent = "Loading…";
+  </script>
+
+  <!-- ========= ONE-GLYPH PATCH ========= -->
+  <script>
+    (function(){
+      function wrapOnes(root){
+        if (!root) return;
+        const walker = document.createTreeWalker(
+          root,
+          NodeFilter.SHOW_TEXT,
+          {
+            acceptNode: (node) => {
+              if (!node.nodeValue || node.nodeValue.indexOf('1') === -1)
+                return NodeFilter.FILTER_REJECT;
+              const p = node.parentNode;
+              if (!p || (p.classList && p.classList.contains('one-glyph')))
+                return NodeFilter.FILTER_REJECT;
+              if (p.closest && p.closest('.no-one-stylize'))
+                return NodeFilter.FILTER_REJECT;
+              return NodeFilter.FILTER_ACCEPT;
+            }
+          }
+        );
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+
+        nodes.forEach(node => {
+          const txt = node.nodeValue;
+          if (!txt || txt.indexOf('1') === -1) return;
+          const frag = document.createDocumentFragment();
+          for (let i=0;i<txt.length;i++){
+            const ch = txt[i];
+            if (ch === '1'){
+              const span = document.createElement('span');
+              span.className = 'one-glyph';
+              span.textContent = '1';
+              frag.appendChild(span);
+            } else {
+              frag.appendChild(document.createTextNode(ch));
+            }
+          }
+          node.parentNode.replaceChild(frag, node);
+        });
+      }
+
+      window.__wrapOnes = wrapOnes;
+
+      document.querySelectorAll('.pnl-card')
+        .forEach(card => wrapOnes(card));
+
+      const container = document.getElementById('pnlBackdrop');
+      if (container) {
+        let rafId = null;
+        const mo = new MutationObserver(() => {
+          if (rafId) cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(()=> {
+            document.querySelectorAll('.pnl-card')
+              .forEach(card => wrapOnes(card));
+          });
+        });
+        mo.observe(container, {subtree:true, childList:true, characterData:true});
+      }
+    })();
+  </script>
 </body>
 </html>
