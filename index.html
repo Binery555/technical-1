@@ -253,7 +253,6 @@
       left:50%;
       transform:translateX(-50%);
       width:var(--app-w);
-      max-width:100%;
       background:#1e2128;
       display:flex;
       padding:8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
@@ -297,11 +296,9 @@
       padding:0 12px calc(var(--bottom-nav-h) + 10px + env(safe-area-inset-bottom, 0px));
     }
     .pnl-modal-backdrop.open{ display:flex; }
-
     .pnl-modal{ position:relative; max-width:520px; width:100%; outline:0; border:0; background:transparent; }
     .pnl-close{ display:none !important; }
 
-    /* ORIGINAL PNL SCENE (will be overridden below by responsive block) */
     .pnl-scene{
       background:#2f343d;
       border:1px solid #3a3f49;
@@ -647,104 +644,6 @@
     /* Slightly larger labels */
     .bottom-nav button span {
       font-size: 11px;
-    }
-  </style>
-
-  <!-- ✅ RESPONSIVE PROFIT CARD FRAME + ICON LABEL FIX -->
-  <style>
-    /* Profit card scene anchored at bottom, responsive, with yellow frame */
-    .pnl-modal-backdrop {
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .pnl-scene {
-      position: relative;
-      width: min(430px, 100vw - 24px);
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 14px 14px 18px;
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      transform: none;
-      overflow: visible;
-      max-height: calc(100vh - 40px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Yellow frame around profit card area that fits any screen */
-    .pnl-scene::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 18px;
-      border: 2px solid #f0b90b;
-      pointer-events: none;
-      box-sizing: border-box;
-    }
-
-    .pnl-carousel,
-    .pnl-slide {
-      width: 100% !important;
-    }
-
-    .pnl-track {
-      width: 300%;
-    }
-
-    .pnl-card {
-      width: 100%;
-      margin: 0 auto;
-      border-radius: 14px;
-      box-shadow: 0 0 10px rgba(0,0,0,.6);
-    }
-
-    @media (max-height: 600px) {
-      .pnl-scene {
-        max-height: calc(100vh - 24px);
-        padding: 10px;
-      }
-    }
-
-    /* Icon labels directly under icons (bottom nav) */
-    .bottom-nav button {
-      align-items: center;
-      justify-content: flex-start;
-      gap: 4px;
-    }
-
-    .bottom-nav button span {
-      display: block;
-      margin-top: 3px;
-      line-height: 1.1;
-      text-align: center;
-    }
-
-    .bottom-nav .photo-slot--bottom {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Underbar actions: text clearly under icon */
-    .pnl-underbar .action {
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .pnl-underbar .action img {
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .pnl-underbar .action span {
-      display: block;
-      line-height: 1.1;
-      text-align: center;
     }
   </style>
 </head>
