@@ -515,9 +515,9 @@
       font-weight: inherit !important;
     }
 
-    /* ✅ CHANGED ONLY THIS: month "1" a bit smaller */
+    /* ✅ CHANGED ONLY THIS: month digit "1" a bit smaller (also works for 01, 10, 11, 12) */
     .pnl-card .month-one{
-      font-size: .70em;
+      font-size: .82em;
       line-height: 1;
       display:inline-block;
       transform: translateY(.2px);
@@ -1671,13 +1671,12 @@
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
+    /* ✅ CHANGED ONLY THIS: wrap any "1" inside the MONTH (so it works for 01 too) */
     function formatTimeWithTinyMonthOne(ts){
       const m = ts.match(/^(\d{4})-(\d{2})-(\d{2}) (.+)$/);
       if(!m) return ts;
       const [, Y, MM, DD, rest] = m;
-      const mm = (MM.charAt(0) === '1')
-        ? `<span class="month-one">1</span>${MM.charAt(1)}`
-        : MM;
+      const mm = MM.replace(/1/g, '<span class="month-one">1</span>');
       return `${Y}-${mm}-${DD} ${rest}`;
     }
 
