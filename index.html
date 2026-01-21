@@ -51,8 +51,7 @@
 
       --bottom-nav-h: 64px;
 
-      /* ✅ CHANGED: keep frame centered when width is larger */
-      --scene-offset-x: 0cm;
+      --scene-offset-x: -0.5cm;
       --scene-offset-y: 1.1cm;
 
       /* ✅ Footer badge alignment helpers */
@@ -294,8 +293,7 @@
     .pnl-modal-backdrop{
       position:fixed; inset:0; background:rgba(0,0,0,.6);
       display:none; align-items:flex-end; justify-content:center; z-index:1000;
-      /* ✅ CHANGED: move frame lower + cover bottom page icons */
-      padding:0 6px calc(env(safe-area-inset-bottom, 0px) + 8px);
+      padding:0 12px calc(var(--bottom-nav-h) + 10px + env(safe-area-inset-bottom, 0px));
     }
     .pnl-modal-backdrop.open{ display:flex; }
     .pnl-modal{ position:relative; max-width:520px; width:100%; outline:0; border:0; background:transparent; }
@@ -307,8 +305,7 @@
       border-radius:18px;
       padding:12px 12px 16px;
       margin:0 auto;
-      /* ✅ CHANGED: wider side fit for iPhone screen */
-      width:min(calc(var(--app-w) - 12px), calc(100vw - 12px));
+      width:calc(350px + 1.2cm);
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -518,7 +515,7 @@
       font-weight: inherit !important;
     }
 
-    /* ✅ CHANGED: month digit '1' slightly smaller */
+    /* ✅ CHANGED ONLY THIS: month "1" a bit smaller */
     .pnl-card .month-one{
       font-size: .70em;
       line-height: 1;
@@ -648,58 +645,6 @@
     /* Slightly larger labels */
     .bottom-nav button span {
       font-size: 11px;
-    }
-  </style>
-
-  <!-- ✅ PROFIT CARD (PNL MODAL) SIZE FIX: Wider card + taller frame + bigger action icons -->
-  <style id="pnl-profitcard-size-fix">
-    :root{
-      /* ✅ Profit card wider */
-      --pnl-card-w: 380px;
-    }
-
-    /* ✅ Grey frame (around the profit card) a bit taller */
-    .pnl-scene{
-      padding:14px 14px 22px !important;
-    }
-
-    /* ✅ Make the profit card area wider (carousel/slide/underbar all match) */
-    .pnl-carousel{
-      width:min(var(--pnl-card-w), calc(100vw - 28px)) !important;
-    }
-    .pnl-slide{
-      width:min(var(--pnl-card-w), calc(100vw - 28px)) !important;
-      flex:0 0 min(var(--pnl-card-w), calc(100vw - 28px)) !important;
-    }
-    .pnl-underbar{
-      width:min(var(--pnl-card-w), calc(100vw - 28px)) !important;
-    }
-
-    /* ✅ Profit card a bit taller */
-    .pnl-card .card-header{
-      margin-bottom:1.15cm !important;
-    }
-    .pnl-card .card-body{
-      margin-bottom:1.15cm !important;
-      padding-bottom:24px !important;
-    }
-
-    /* ✅ Bottom action icons bigger (Save/Copy/Telegram/Instagram/More) */
-    .pnl-underbar .bottom-bar{
-      gap:12px !important;
-    }
-    .pnl-underbar .action{
-      width:56px !important;
-      height:56px !important;
-      border-radius:14px !important;
-      gap:5px !important;
-    }
-    .pnl-underbar .action img{
-      width:24px !important;
-      height:24px !important;
-    }
-    .pnl-underbar .action span{
-      font-size:11px !important;
     }
   </style>
 </head>
@@ -1726,12 +1671,13 @@
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    /* ✅ CHANGED: wrap any '1' inside the MONTH (including "01") */
     function formatTimeWithTinyMonthOne(ts){
       const m = ts.match(/^(\d{4})-(\d{2})-(\d{2}) (.+)$/);
       if(!m) return ts;
       const [, Y, MM, DD, rest] = m;
-      const mm = (MM || '').replace(/1/g, `<span class="month-one">1</span>`);
+      const mm = (MM.charAt(0) === '1')
+        ? `<span class="month-one">1</span>${MM.charAt(1)}`
+        : MM;
       return `${Y}-${mm}-${DD} ${rest}`;
     }
 
