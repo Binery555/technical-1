@@ -51,7 +51,8 @@
 
       --bottom-nav-h: 64px;
 
-      --scene-offset-x: -0.5cm;
+      /* ✅ CHANGED: keep frame centered when width is larger */
+      --scene-offset-x: 0cm;
       --scene-offset-y: 1.1cm;
 
       /* ✅ Footer badge alignment helpers */
@@ -293,7 +294,8 @@
     .pnl-modal-backdrop{
       position:fixed; inset:0; background:rgba(0,0,0,.6);
       display:none; align-items:flex-end; justify-content:center; z-index:1000;
-      padding:0 12px calc(var(--bottom-nav-h) + 10px + env(safe-area-inset-bottom, 0px));
+      /* ✅ CHANGED: move frame lower + cover bottom page icons */
+      padding:0 6px calc(env(safe-area-inset-bottom, 0px) + 8px);
     }
     .pnl-modal-backdrop.open{ display:flex; }
     .pnl-modal{ position:relative; max-width:520px; width:100%; outline:0; border:0; background:transparent; }
@@ -305,7 +307,8 @@
       border-radius:18px;
       padding:12px 12px 16px;
       margin:0 auto;
-      width:calc(350px + 1.2cm);
+      /* ✅ CHANGED: wider side fit for iPhone screen */
+      width:min(calc(var(--app-w) - 12px), calc(100vw - 12px));
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -515,8 +518,9 @@
       font-weight: inherit !important;
     }
 
+    /* ✅ CHANGED: month digit '1' slightly smaller */
     .pnl-card .month-one{
-      font-size: .80em;
+      font-size: .70em;
       line-height: 1;
       display:inline-block;
       transform: translateY(.2px);
@@ -1670,13 +1674,12 @@
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
+    /* ✅ CHANGED: wrap any '1' inside the MONTH (including "01") */
     function formatTimeWithTinyMonthOne(ts){
       const m = ts.match(/^(\d{4})-(\d{2})-(\d{2}) (.+)$/);
       if(!m) return ts;
       const [, Y, MM, DD, rest] = m;
-      const mm = (MM.charAt(0) === '1')
-        ? `<span class="month-one">1</span>${MM.charAt(1)}`
-        : MM;
+      const mm = (MM || '').replace(/1/g, `<span class="month-one">1</span>`);
       return `${Y}-${mm}-${DD} ${rest}`;
     }
 
