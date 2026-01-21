@@ -650,6 +650,58 @@
       font-size: 11px;
     }
   </style>
+
+  <!-- ✅ PROFIT CARD (PNL MODAL) SIZE FIX: Wider card + taller frame + bigger action icons -->
+  <style id="pnl-profitcard-size-fix">
+    :root{
+      /* ✅ Profit card wider */
+      --pnl-card-w: 380px;
+    }
+
+    /* ✅ Grey frame (around the profit card) a bit taller */
+    .pnl-scene{
+      padding:14px 14px 22px !important;
+    }
+
+    /* ✅ Make the profit card area wider (carousel/slide/underbar all match) */
+    .pnl-carousel{
+      width:min(var(--pnl-card-w), calc(100vw - 28px)) !important;
+    }
+    .pnl-slide{
+      width:min(var(--pnl-card-w), calc(100vw - 28px)) !important;
+      flex:0 0 min(var(--pnl-card-w), calc(100vw - 28px)) !important;
+    }
+    .pnl-underbar{
+      width:min(var(--pnl-card-w), calc(100vw - 28px)) !important;
+    }
+
+    /* ✅ Profit card a bit taller */
+    .pnl-card .card-header{
+      margin-bottom:1.15cm !important;
+    }
+    .pnl-card .card-body{
+      margin-bottom:1.15cm !important;
+      padding-bottom:24px !important;
+    }
+
+    /* ✅ Bottom action icons bigger (Save/Copy/Telegram/Instagram/More) */
+    .pnl-underbar .bottom-bar{
+      gap:12px !important;
+    }
+    .pnl-underbar .action{
+      width:56px !important;
+      height:56px !important;
+      border-radius:14px !important;
+      gap:5px !important;
+    }
+    .pnl-underbar .action img{
+      width:24px !important;
+      height:24px !important;
+    }
+    .pnl-underbar .action span{
+      font-size:11px !important;
+    }
+  </style>
 </head>
 <body>
   <div class="app">
