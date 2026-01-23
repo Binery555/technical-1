@@ -727,6 +727,20 @@
       white-space:nowrap !important;
     }
   </style>
+
+  <!-- ✅ NEW: HIDE TRADES SCROLLBAR (feed) COMPLETELY -->
+  <style>
+    /* ✅ Hide scrollbar but keep scrolling */
+    .feed{
+      -ms-overflow-style: none !important; /* IE/old Edge */
+      scrollbar-width: none !important;    /* Firefox */
+    }
+    .feed::-webkit-scrollbar{
+      width: 0 !important;   /* Chrome/Safari/Edge */
+      height: 0 !important;
+      display: none !important;
+    }
+  </style>
 </head>
 
 <body>
