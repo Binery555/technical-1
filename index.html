@@ -648,15 +648,13 @@
     }
   </style>
 
-  <!-- ✅ NEW: SHARE MODAL FRAME full width + hide bottom nav + bigger actions (labels outside) -->
+  <!-- ✅ UPDATED: SHARE MODAL FRAME goes FULL DOWN to cover bottom nav icons (like your photo) -->
   <style>
-    body.pnl-open{
-      overflow:hidden;
-    }
+    body.pnl-open{ overflow:hidden; }
 
-    /* frame edges match iPhone screen */
+    /* ✅ IMPORTANT: remove bottom padding that was keeping the frame above bottom-nav */
     .pnl-modal-backdrop{
-      padding: 0 10px calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+      padding: 0 10px 0 !important;              /* ✅ frame can go all the way down */
       align-items: flex-end !important;
     }
 
@@ -665,17 +663,18 @@
       max-width: 520px !important;
     }
 
-    /* grey frame becomes full width + centered (no offset) */
+    /* ✅ grey frame full width + sits at very bottom (covers Home/Market/Trade/Futures/Assets) */
     .pnl-scene{
       width: 100% !important;
       max-width: var(--app-w) !important;
       transform: none !important;
       margin: 0 auto !important;
       border-radius: 22px !important;
-      padding: 12px 12px calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+      /* extra bottom padding so labels + iPhone home indicator are safe */
+      padding: 12px 12px calc(34px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
-    /* top little handle line like screenshot */
+    /* top handle */
     .pnl-scene::before{
       content:'';
       display:block;
@@ -686,35 +685,27 @@
       margin: 2px auto 10px;
     }
 
-    /* cover/hide bottom nav when share modal open */
-    body.pnl-open .bottom-nav{
-      opacity:0 !important;
-      pointer-events:none !important;
-    }
-
-    /* underbar full width (selector + action icons) */
+    /* underbar full width */
     .pnl-underbar{
       width: 100% !important;
       margin: 14px 0 0 !important;
       align-items: stretch !important;
     }
-
     .pnl-underbar .selector{
       transform: none !important;
       padding: 0 6px !important;
       gap: 18px !important;
     }
-
     .pnl-underbar .bottom-bar{
       transform: none !important;
       width: 100% !important;
-      padding: 12px 6px 26px !important;
+      padding: 12px 6px 34px !important;       /* ✅ a bit more like screenshot */
       justify-content: space-between !important;
       gap: 0 !important;
       align-self: stretch !important;
     }
 
-    /* bigger icons + label outside below the box */
+    /* bigger actions + label outside */
     .pnl-underbar .action{
       width:56px !important;
       height:56px !important;
@@ -724,12 +715,7 @@
       gap:0 !important;
       overflow:visible !important;
     }
-
-    .pnl-underbar .action img{
-      width:22px !important;
-      height:22px !important;
-    }
-
+    .pnl-underbar .action img{ width:22px !important; height:22px !important; }
     .pnl-underbar .action span{
       position:absolute !important;
       top:calc(100% + 6px) !important;
@@ -1805,12 +1791,11 @@
       });
     }
 
-    /* ✅ UPDATED: hide bottom nav + full-frame modal behavior */
     function openPNLModal(trade){
       setBottomInset();
       currentSharedTrade = trade;
 
-      document.body.classList.add('pnl-open');  // ✅ hide bottom nav icons
+      document.body.classList.add('pnl-open');
 
       pnlEls.user.textContent = usernameStatic;
       const ts = nowStamp();
@@ -1827,7 +1812,7 @@
       pnlEls.backdrop.classList.remove('open');
       pnlEls.backdrop.setAttribute('aria-hidden','true');
 
-      document.body.classList.remove('pnl-open'); // ✅ restore bottom nav icons
+      document.body.classList.remove('pnl-open');
 
       currentSharedTrade = null;
     }
