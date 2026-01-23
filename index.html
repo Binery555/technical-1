@@ -515,12 +515,12 @@
       font-weight: inherit !important;
     }
 
-    /* ✅ CHANGED ONLY THIS: month digit "1" a bit smaller (also works for 01, 10, 11, 12) */
+    /* ✅ CHANGED ONLY THIS: month digit "1" move slightly UP to match other digits */
     .pnl-card .month-one{
-      font-size: .82em;
+      font-size: 1em;
       line-height: 1;
       display:inline-block;
-      transform: translateY(.2px);
+      transform: translateY(-0.6px);
     }
 
     .pnl-card .prices .last{
@@ -728,17 +728,29 @@
     }
   </style>
 
-  <!-- ✅ NEW: HIDE TRADES SCROLLBAR (feed) COMPLETELY -->
+  <!-- ✅ UPDATED: HIDE TRADES SCROLLBAR (feed) — if it still shows, make it BLACK -->
   <style>
     /* ✅ Hide scrollbar but keep scrolling */
     .feed{
       -ms-overflow-style: none !important; /* IE/old Edge */
       scrollbar-width: none !important;    /* Firefox */
+      scrollbar-color: #000 transparent !important; /* if visible, make it black */
     }
+
+    /* WebKit (Chrome/Safari/Edge) */
     .feed::-webkit-scrollbar{
-      width: 0 !important;   /* Chrome/Safari/Edge */
+      width: 0 !important;
       height: 0 !important;
       display: none !important;
+      background: transparent !important;
+    }
+    /* If any browser still renders it, thumb will be black */
+    .feed::-webkit-scrollbar-thumb{
+      background: #000 !important;
+      border-radius: 10px !important;
+    }
+    .feed::-webkit-scrollbar-track{
+      background: transparent !important;
     }
   </style>
 </head>
@@ -1766,7 +1778,7 @@
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    /* ✅ CHANGED ONLY THIS: wrap any "1" inside the MONTH (so it works for 01 too) */
+    /* ✅ wrap any "1" inside the MONTH */
     function formatTimeWithTinyMonthOne(ts){
       const m = ts.match(/^(\d{4})-(\d{2})-(\d{2}) (.+)$/);
       if(!m) return ts;
