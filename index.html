@@ -247,6 +247,14 @@
     }
     .tp-btn:hover{background:var(--secondary-bg)}
 
+    .panel-divider{
+      margin-top:8px;
+      height:1px;
+      width:100%;
+      background:#3a4048;
+      opacity:.95;
+    }
+
     .bottom-nav{
       position:fixed;
       bottom:0;
@@ -1435,12 +1443,8 @@
             </div>
           </div>
         </div>
-        <div class="tp-actions">
-          <button class="tp-btn">Leverage</button>
-          <button class="tp-btn">TP/SL</button>
-          <button class="tp-btn">Close</button>
-          <button class="tp-btn">Reverse</button>
-        </div>`;
+        <div class="panel-divider"></div>
+`;
 
       const panelState = {
         node: panel,
